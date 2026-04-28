@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    
+    <meta name="author" content="SoloWalker">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes ASAP (before DOMContentLoaded)
+            (function() {
+                const addBodyClass = () => {
+                    const b = document.body;
+                    if (!b) return false;
+                    b.classList.add(theme + "-mode");
+                    return true;
+                };
+
+                // Try immediately
+                if (addBodyClass()) return;
+
+                // Observe until body exists
+                const mo = new MutationObserver(() => {
+                    if (addBodyClass()) mo.disconnect();
+                });
+                mo.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        })();
+    </script>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2026/04/24/java动态类加载/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java类的动态加载">
+<meta property="og:url" content="http://example.com/2026/04/24/Java%E5%8A%A8%E6%80%81%E7%B1%BB%E5%8A%A0%E8%BD%BD/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-04-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-28T12:42:18.652Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="java安全，类加载机制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/redefine-favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/redefine-favicon.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/redefine-favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            java类的动态加载 | SoloWalker
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":false,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/kaneki_bg.jpg","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/kaneki_bg.jpg","dark":"/images/kaneki_bg.jpg"},"title":"SoloWalker","subtitle":{"text":["WebSecurity Learner"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":[{"icon":"fa-brands fa-github","url":null},{"icon":"fa-brands fa-twitter","url":null},{"icon":"fa-solid fa-at","url":"you@example.com"},{"icon":"fa-brands fa-telegram","url":null},{"icon":"/images/custom-icon.svg","url":null}],"qrs":[{"icon":"fa-brands fa-weixin","qr":null},{"icon":"/images/custom-icon.svg","qr":null}]}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1","theme":{"light":"default","dark":"dark"}}},"version":"2.9.0","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-solid fa-tags"},"Friends":{"path":"/links/","icon":"fa-solid fa-link"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur","masonry":{"batch_size":12,"initial_batch_size":24}},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footer":{"runtime":true,"icon":"<i class=\"fa-solid fa-heart fa-beat\" style=\"--fa-animation-duration: 0.5s; color: #f54545\"></i>","start":"2022/8/17 11:45:14","statistics":true,"customize":null,"icp":{"enable":false,"number":null,"url":null}},"footerStart":"2022/8/17 11:45:14","mermaid":{"style":{"light":"default","dark":"dark"}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.i18n = {"search":"Search...","toc":"On this page","prev":"Prev","next":"Next","prev_posts":"Prev posts","next_posts":"Next posts","page":"Page %d","recent_posts":"Recent Posts","share":"Share","powered_by":"POWERED BY %s","theme":"THEME","rss_feed":"RSS Feed","category":"Category","categories":"Categories","tag":"Tag","tags":"Tags","post":"Post","posts":"Posts","tagcloud":"Tag Cloud","comment":"Comment","comments":"Comments","home":"Home","archive":"Archive","archives":"Archives","top":"TOP","sticky":"Sticky","go-back-home":"Go Back Home","masonry_loading":"Loading photos...","image_viewer":"Image viewer","close":"Close","exif":{"title":"EXIF","cards":{"camera":"Camera","lens":"Lens","exposure":"Exposure","other":"Other"},"fields":{"make":"Brand","model":"Model","date_taken":"Date taken","lens_model":"Lens","focal_length":"Focal length","focus_mode":"Focus mode","shutter":"Shutter","aperture":"Aperture","iso":"ISO","exposure_program":"Exposure program","exposure_compensation":"Exposure compensation","metering_mode":"Metering mode","flash":"Flash","white_balance":"White balance","latitude":"Latitude","longitude":"Longitude","altitude":"Altitude"},"status":{"loading":"Loading...","no_exif":"No EXIF available","library_missing":"EXIF library not loaded","image_source_missing":"Image source unavailable","unavailable":"EXIF unavailable (blocked by CORS or missing metadata)","flag_unavailable":"EXIF unavailable"}},"about":"About","changelog":"Changelog","links":"Links","link":"Link","friends":"Friends","friend":"Friend","timeline":"Timeline","shuoshuo":"Shuoshuo","bookmarks":"Bookmarks","site_uv":"VISITOR COUNT","site_pv":"TOTAL PAGE VIEWS","read_more":"Read more","wordcount":"Words","min2read":"Mins","status":"Status","runtime":"Blog up for","days":"days","hours":"hrs","minutes":"Min","seconds":"Sec","optimized_by":"and Optimized by Evan","rights":"All Rights Reserved","site_posts":"%s posts in total","site_wordcount":"%s words in total","copyright":{"author":"Author","title":"Title","link":"Link","create_time":"Created at","update_time":"Updated at","license_title":"License","license_content":"This work is licensed under %s.","all_rights_reserved":"All Rights Reserved &#169; %s","public_domain":"This work is in the public domain."},"ago":{"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"},"create_time":"Created","update_time":"Updated","expired":"This post is written %s days ago, and the content may not be up to date."};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                SoloWalker
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-solid fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-solid fa-link fa-fw"></i>
+                                    FRIENDS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-solid fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                FRIENDS
+                            </span>
+                            
+                                <i class="fa-solid fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">2</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">14</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">java类的动态加载</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="/images/kaneki_avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">SoloWalker</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-04-24</span>
+        <span class="mobile">2026-04-24</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-04-28 20:42:18</span>
+            <span class="mobile">2026-04-28 20:42:18</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/Web%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8/">java安全</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/java%E5%AE%89%E5%85%A8%EF%BC%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">java安全，类加载机制</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="java类的动态加载"><a href="#java类的动态加载" class="headerlink" title="java类的动态加载"></a>java类的动态加载</h1><h2 id="类加载器和双亲委派机制"><a href="#类加载器和双亲委派机制" class="headerlink" title="类加载器和双亲委派机制"></a>类加载器和双亲委派机制</h2><h3 id="类加载器的作用"><a href="#类加载器的作用" class="headerlink" title="类加载器的作用"></a>类加载器的作用</h3><p>一句话概括：把类的字节码文件（.class）加载到 JVM 内存中，并转换成可以被虚拟机直接使用的 java 类，即 Class 对象。</p>
+<ul>
+<li>加载 Class 文件</li>
+</ul>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Person</span> <span class="variable">p</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>();</span><br></pre></td></tr></table></figure></div>
+
+<p><code>Person</code>这个类本身是抽象的，通过<code>new</code>操作，实例化。类加载做的则是把类这个模板经过编译形成的字节码传入 JVM，生成一个具备这个类的所有数据的 Class 对象。(Class 对象就当成是这个类理解即可)</p>
+<p>ClassLoader 的工作流程：</p>
+<p>首先，一个类编译后形成的 class 文件经过类加载器进入 JVM并产生 Class 对象，然后在 JVM 中进行初始化，我们可以通过这个 Class 对象的 <code>getClassLoader()</code> 方法获取这个类对应的类加载器。我们也可以通过对这个 Class 对象调用其 <code>newInstance()</code> 方法来实例化一个对象，通过这个实例化对象的 <code>getClass()</code> 方法来获取对应的 Class 对象。</p>
+<h3 id="3种类加载器"><a href="#3种类加载器" class="headerlink" title="3种类加载器"></a>3种类加载器</h3><h4 id="启动类加载器-Bootstrap-ClassLoader"><a href="#启动类加载器-Bootstrap-ClassLoader" class="headerlink" title="启动类加载器 (Bootstrap ClassLoader)"></a>启动类加载器 (Bootstrap ClassLoader)</h4><p>其底层原生代码属是由 C++ 编写的，属于 JVM 的一部分。</p>
+<p>不继承于<code>java.lang.ClassLoader</code>类，也没有父类加载器，主要负责加载核心 java 库（即 JVM 本身），储存在<code>/jre/lib/rt.jar</code>中。</p>
+<h4 id="扩展类加载器-ExtensionsClassLoader"><a href="#扩展类加载器-ExtensionsClassLoader" class="headerlink" title="扩展类加载器 (ExtensionsClassLoader)"></a>扩展类加载器 (ExtensionsClassLoader)</h4><p>这个类加载器是由<code>sun.misc.Launcher$ExtClassLoader</code>类实现的，用来加载<code>/jre/lib/ext</code>或<code>java.ext.dirs</code>指定的目录。Java 虚拟机会提供一个扩展库目录，此类加载器在目录中查找并加载 java 类。</p>
+<p>在 JDK9 以及更高版本，由于引入了模块化系统后，此类加载器被替代为平台类加载器，加载 Java SE 平台模块（如 java.sql，java.xml 等）。</p>
+<h4 id="应用类加载器"><a href="#应用类加载器" class="headerlink" title="应用类加载器"></a>应用类加载器</h4><p>此加载器由<code>sun.misc.Launcher$AppClassLoader</code>实现，一般通过<code>java.class.path</code>或者<code>Classpath</code>环境变量来加载 java 类，也就是常说的 classpath 路径。一般我们使用这个加载器来加载 java 应用类，可以通过 <code>ClassLoader.getSystemClassLoader()</code>来获取它。</p>
+<h3 id="双亲委派机制"><a href="#双亲委派机制" class="headerlink" title="双亲委派机制"></a>双亲委派机制</h3><p>一句话概括：一个类加载器收到加载请求时，不是先自己尝试加载，而是把请求委派给父加载器，一层层向上传递，直到启动类加载器。只有当父加载器反馈不加载时，子加载器才会自己尝试加载。</p>
+<h4 id="从错误的方向看双亲委派"><a href="#从错误的方向看双亲委派" class="headerlink" title="从错误的方向看双亲委派"></a>从错误的方向看双亲委派</h4><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">String</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>();</span><br><span class="line">        s.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这样看似乎没有问题，但是报错很神奇：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">错误: 在类 java.lang.String 中找不到 main 方法, 请将 main 方法定义为:</span><br><span class="line">   public static void main(String[] args)</span><br><span class="line">否则 JavaFX 应用程序类必须扩展javafx.application.Application</span><br></pre></td></tr></table></figure></div>
+
+<p>明明以及定义了 main 方法，却报错没有 main 方法。这里则涉及双亲委派机制。</p>
+<p>类加载器在被调用时，也就是在<code>new</code>之前，是以启动类到扩展类到应用类加载器去寻找，而在启动类加载器中是能找到<code>java.lang.String</code>类的，这个<code>String</code>类里是没有 main 方法的。</p>
+<h3 id="代码块加载顺序"><a href="#代码块加载顺序" class="headerlink" title="代码块加载顺序"></a>代码块加载顺序</h3><p>这里所说的代码块主要是四种：</p>
+<ul>
+<li>静态代码块：<code>static{}</code></li>
+<li>构造代码块：<code>{}</code></li>
+<li>无参构造器：<code>classname()</code></li>
+<li>有参构造器：<code>classname(参数)</code></li>
+</ul>
+<h4 id="实例化对象"><a href="#实例化对象" class="headerlink" title="实例化对象"></a>实例化对象</h4><p>Person.java：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;静态代码块&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">staticFunction</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;静态方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;构造代码块&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;无参构造方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">(String name, <span class="type">int</span> age)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">        System.out.println(<span class="string">&quot;有参构造方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Person&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&quot;, age=&quot;</span> + age +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>Loadclasstest.java：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>运行结果：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">静态代码块</span><br><span class="line">构造代码块</span><br><span class="line">无参构造方法</span><br></pre></td></tr></table></figure></div>
+
+<p>类的实例化其实就是一种初始化，而类加载是在初始化之前触发的，静态代码块和静态方法是和类挂钩的，所以静态代码块先触发。然后不管调用的什么构造方法，都会先调用构造代码块，然后调用对应的构造方法。</p>
+<h4 id="调用静态方法"><a href="#调用静态方法" class="headerlink" title="调用静态方法"></a>调用静态方法</h4><p>Loadclasstest.java：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        Person.staticFunction();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>运行结果：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">静态代码块</span><br><span class="line">静态方法</span><br></pre></td></tr></table></figure></div>
+
+<p>直接调用静态方法，会先调用静态方法块，然后调用对应的静态方法。</p>
+<h4 id="对静态成员变量赋值"><a href="#对静态成员变量赋值" class="headerlink" title="对静态成员变量赋值"></a>对静态成员变量赋值</h4><p>Loadclasstest.java：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        Person.id = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>运行结果：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">静态代码块</span><br></pre></td></tr></table></figure></div>
+
+<p>对静态成员变量赋值涉及到类初始化的过程，所以静态代码块会在静态成员变量赋值时执行。</p>
+<h4 id="class获取类"><a href="#class获取类" class="headerlink" title="class获取类"></a>class获取类</h4><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">p</span> <span class="operator">=</span> Person.class;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>运行结果为空，说明利用<code>class</code>获取类不会记载类。</p>
+<h4 id="forName-获取类"><a href="#forName-获取类" class="headerlink" title="forName 获取类"></a>forName 获取类</h4><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        Class.forName(<span class="string">&quot;LoadClass.Person&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;          <span class="comment">//执行静态代码块</span></span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        Class.forName(<span class="string">&quot;LoadClass.Person&quot;</span>,<span class="literal">true</span>,ClassLoader.getSystemClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;                <span class="comment">//执行静态代码块</span></span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        Class.forName(<span class="string">&quot;LoadClass.Person&quot;</span>,<span class="literal">false</span>,ClassLoader.getSystemClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;                 <span class="comment">//没有输出</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这里的<code>Class.forName()</code>是经过重载的，第二个参数是是否进行初始化，静态代码块是在类初始化时执行的，所以会有不同的结果。</p>
+<h4 id="ClassLoader-loadClass-获取类"><a href="#ClassLoader-loadClass-获取类" class="headerlink" title="ClassLoader.loadClass()获取类"></a>ClassLoader.loadClass()获取类</h4><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Loadclasstest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">ClassLoader</span> <span class="variable">cl</span> <span class="operator">=</span> ClassLoader.getSystemClassLoader();</span><br><span class="line">        Class&lt;?&gt; c = cl.loadClass(<span class="string">&quot;LoadClass.Person&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;           <span class="comment">//没有输出</span></span><br></pre></td></tr></table></figure></div>
+
+<p><code>ClassLoader.loadClass()</code>不会进行类的初始化，如果用<code>newInstance()</code>实例化则会由输出。</p>
+<h2 id="动态加载字节码"><a href="#动态加载字节码" class="headerlink" title="动态加载字节码"></a>动态加载字节码</h2><h3 id="字节码的概念"><a href="#字节码的概念" class="headerlink" title="字节码的概念"></a>字节码的概念</h3><p>字节码是 java 编译器生成的中间代码，介于源码与机器码之间，是 JVM 能够理解的指令集，被存储在 .class 文件中。</p>
+<p>经过 java 编译器编译出的 class 文件实际是一个二进制文件，但不是机器码，我们通过 idea 打开 class 文件看到的实际上是经过 idea 反编译的代码。</p>
+<h4 id="类加载器的原理"><a href="#类加载器的原理" class="headerlink" title="类加载器的原理"></a>类加载器的原理</h4><p>调用 ClassLoader 的 loadClass() 方法时，会调用到内部的 findClass() 方法，而 ClassLoader 的 findClass 方法其实是没有实现的，所以到底会调用谁的 findClass 呢？由于 findClass() 是一个虚方法，运行时是根据对象的类型决定的，对象是一个自定义的对象，所以就是尝试调用<code>AppClassLoader</code>的 findClass 方法，但这个类没有重写这个方法，所以要去这个类的父类，即<code>URLClassLoader</code>来调用 findClass 方法。在 findClass 内部又调用了自身的 defineClass 方法，在自身的 defineClass 方法中又调用了父类的 defineClass 方法。所以，类加载的最终出口还是 ClassLoader 的 defineClass 方法。</p>
+<p>由于类加载器直接加载字节码，如果我们在反序列化中能够控制类加载器加载远程字节码，就会有更多攻击手段。</p>
+<h3 id="URLClassLoader-加载远程-class-文件"><a href="#URLClassLoader-加载远程-class-文件" class="headerlink" title="URLClassLoader 加载远程 class 文件"></a>URLClassLoader 加载远程 class 文件</h3><p><code>URLClassLoader</code>实际上是我们默认使用的<code>AppClassLoader</code>的父类，在学习<code>URLClassLoader</code>的工作过程其实就是在学习默认类加载器的工作流程。</p>
+<p>一般情况下，java 会根据配置项<code>sun.boot.class.path</code>和<code>java.class.path</code>中列举的基础路径（这些路径是经过处理的<code>java.net.URL</code>类）来寻找 .class 文件加载，这个路径分三种情况：</p>
+<ol>
+<li>URL 没有以 &#x2F; 结尾，则认为是一个 jar 包，使用<code>JarLoader</code>来寻找类，即在 jar 包中寻找 class 文件</li>
+<li>URL 以 &#x2F; 结尾，且协议名为 file，则使用<code>FileLoader</code>来寻找类，在本地文件系统寻找 class 文件</li>
+<li>URL 以 &#x2F; 结尾，协议名不是 file，则使用基本的<code>Loader</code>来寻找类</li>
+</ol>
+<h4 id="file-协议"><a href="#file-协议" class="headerlink" title="file 协议"></a>file 协议</h4><p>在测试目录新建一个 Calc.java：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Calc</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Runtime.getRuntime().exec(<span class="string">&quot;calc&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>在终端中 javac 编译一下，产生 class 文件。</p>
+<p>测试代码样例：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.MalformedURLException;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.net.URLClassLoader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">URLloadTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">URLClassLoader</span> <span class="variable">ucl</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URLClassLoader</span>(<span class="keyword">new</span> <span class="title class_">URL</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;file:///C:\\Users\\32202\\Desktop\\java测试\\out\\production\\test\\&quot;</span>)&#125;);</span><br><span class="line">        Class&lt;?&gt; calc = ucl.loadClass(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>ucl 是一个指向这个 Calc.class 的类加载器实例，调用 loadClass 方法来加载这个类再实例化就能弹出计算器。</p>
+<h4 id="HTTP-协议"><a href="#HTTP-协议" class="headerlink" title="HTTP 协议"></a>HTTP 协议</h4><p>在 Calc.class 所在目录下执行<code>python -m http.server 4444</code>建立 HTTP 服务，编写恶意类：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.MalformedURLException;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.net.URLClassLoader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">URLloadTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">URLClassLoader</span> <span class="variable">ucl</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URLClassLoader</span>(<span class="keyword">new</span> <span class="title class_">URL</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;http://localhost:4444&quot;</span>)&#125;);</span><br><span class="line">        Class&lt;?&gt; calc = ucl.loadClass(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>也能弹出计算器。</p>
+<h4 id="file-jar-协议"><a href="#file-jar-协议" class="headerlink" title="file+jar 协议"></a>file+jar 协议</h4><p>先把这个 Calc.class 文件打包成 jar 包：<code>jar -cvf Calc.jar Calc.class</code></p>
+<p>调用恶意类：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.MalformedURLException;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.net.URLClassLoader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">URLloadTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">URLClassLoader</span> <span class="variable">ucl</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URLClassLoader</span>(<span class="keyword">new</span> <span class="title class_">URL</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;jar:file:///C:\\Users\\32202\\Desktop\\java测试\\out\\production\\test\\Calc.jar!/&quot;</span>)&#125;);</span><br><span class="line">        Class&lt;?&gt; calc = ucl.loadClass(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>也能弹出计算器。</p>
+<h4 id="HTTP-jar-协议"><a href="#HTTP-jar-协议" class="headerlink" title="HTTP+jar 协议"></a>HTTP+jar 协议</h4><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.MalformedURLException;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.net.URLClassLoader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">URLloadTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">URLClassLoader</span> <span class="variable">ucl</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URLClassLoader</span>(<span class="keyword">new</span> <span class="title class_">URL</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">URL</span>(<span class="string">&quot;jar:http://localhost:4444/Calc.jar!/&quot;</span>)&#125;);</span><br><span class="line">        Class&lt;?&gt; calc = ucl.loadClass(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>同样能弹出计算器。</p>
+<p>对比之下其实还是 http 协议最灵活，能干更多的事情。</p>
+<h3 id="ClassLoader-defineClass-直接加载字节码"><a href="#ClassLoader-defineClass-直接加载字节码" class="headerlink" title="ClassLoader#defineClass 直接加载字节码"></a>ClassLoader#defineClass 直接加载字节码</h3><p>在上面分析过，类加载的终点是 ClassLoader 的 defineClass 方法，它将传入的字节码转化成真正的 java 类。我们可以利用这个方法实现攻击。</p>
+<p>ClassLoader#defineClass：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> Class&lt;?&gt; defineClass(String name, <span class="type">byte</span>[] b, <span class="type">int</span> off, <span class="type">int</span> len)</span><br><span class="line">        <span class="keyword">throws</span> ClassFormatError</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass(name, b, off, len, <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><code>name</code>是类名，<code>b</code>是字节数组，<code>off</code>是偏移量，即从字节数组的生命位置开始读取，<code>len</code>是字节数组的长度。</p>
+<p>这是一个受保护的方法，利用反射调用该方法实现字节码的加载，实例化后可进行其他攻击手法。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DefineClassTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchMethodException, IOException, InvocationTargetException, IllegalAccessException, InstantiationException &#123;</span><br><span class="line">        <span class="type">ClassLoader</span> <span class="variable">scl</span> <span class="operator">=</span> ClassLoader.getSystemClassLoader();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">dc</span> <span class="operator">=</span> ClassLoader.class.getDeclaredMethod(<span class="string">&quot;defineClass&quot;</span>,</span><br><span class="line">                String.class, <span class="type">byte</span>[].class, <span class="type">int</span>.class, <span class="type">int</span>.class);</span><br><span class="line">        dc.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">byte</span>[] code = Files.readAllBytes(Paths.get(<span class="string">&quot;C:\\Users\\32202\\Desktop\\java测试\\out\\production\\test\\Calc.class&quot;</span>));</span><br><span class="line">        <span class="type">Class</span> <span class="variable">calc</span> <span class="operator">=</span>(Class)dc.invoke(scl, <span class="string">&quot;Calc&quot;</span>, code, <span class="number">0</span>, code.length);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Unsafe-加载字节码"><a href="#Unsafe-加载字节码" class="headerlink" title="Unsafe 加载字节码"></a>Unsafe 加载字节码</h3><p>Unsafe 类中也有 defineClass 方法，也是 defineClass 加载字节码。</p>
+<p>Unsafe 类里面有个属性<code>theUnsafe</code>，值是一个 Unsafe 对象，但是我们实际是无法直接拿到这个属性的。该类里面也有一个<code>getUnsafe</code>方法会返回这个<code>theUnsafe</code>属性，虽然该方法是 public 的，但是由于是采用单例模式设计的，也无法直接调用，所以需要反射进行调用。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"><span class="keyword">import</span> java.security.ProtectionDomain;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UnsafeLoadTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException, NoSuchMethodException, IOException, InvocationTargetException, InstantiationException &#123;</span><br><span class="line">        <span class="type">ClassLoader</span> <span class="variable">cl</span> <span class="operator">=</span> ClassLoader.getSystemClassLoader();</span><br><span class="line">        Class&lt;Unsafe&gt; unsafeClass = Unsafe.class;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">theUnsafe</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        theUnsafe.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">o</span> <span class="operator">=</span> (Unsafe) theUnsafe.get(<span class="literal">null</span>);</span><br><span class="line">        <span class="type">Method</span> <span class="variable">defineClass</span> <span class="operator">=</span> unsafeClass.getDeclaredMethod(<span class="string">&quot;defineClass&quot;</span>, String.class, <span class="type">byte</span>[].class,</span><br><span class="line">                <span class="type">int</span>.class, <span class="type">int</span>.class,ClassLoader.class, ProtectionDomain.class);</span><br><span class="line">        <span class="type">byte</span>[] code = Files.readAllBytes(Paths.get(<span class="string">&quot;C:\\Users\\32202\\Desktop\\java测试\\out\\production\\test\\Calc.class&quot;</span>));</span><br><span class="line">        <span class="type">Class</span> <span class="variable">calc</span> <span class="operator">=</span> (Class)defineClass.invoke(o, <span class="string">&quot;Calc&quot;</span>, code, <span class="number">0</span>, code.length, cl, <span class="literal">null</span>);</span><br><span class="line">        calc.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="TemplatesImpl-加载字节码"><a href="#TemplatesImpl-加载字节码" class="headerlink" title="TemplatesImpl 加载字节码"></a>TemplatesImpl 加载字节码</h3><p>定位到<code>TemplatesImpl</code>类，我们会找到一个内部类<code>TransletClassLoader</code>，该类继承了<code>ClassLoader</code>，并且重写了<code>defineClass</code>方法。</p>
+<p>源码：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">TransletClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String,Class&gt; _loadedExternalExtensionFunctions;</span><br><span class="line"></span><br><span class="line">         TransletClassLoader(ClassLoader parent) &#123;</span><br><span class="line">             <span class="built_in">super</span>(parent);</span><br><span class="line">            _loadedExternalExtensionFunctions = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        TransletClassLoader(ClassLoader parent,Map&lt;String, Class&gt; mapEF) &#123;</span><br><span class="line">            <span class="built_in">super</span>(parent);</span><br><span class="line">            _loadedExternalExtensionFunctions = mapEF;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Class&lt;?&gt; loadClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">            Class&lt;?&gt; ret = <span class="literal">null</span>;</span><br><span class="line">            <span class="comment">// The _loadedExternalExtensionFunctions will be empty when the</span></span><br><span class="line">            <span class="comment">// SecurityManager is not set and the FSP is turned off</span></span><br><span class="line">            <span class="keyword">if</span> (_loadedExternalExtensionFunctions != <span class="literal">null</span>) &#123;</span><br><span class="line">                ret = _loadedExternalExtensionFunctions.get(name);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (ret == <span class="literal">null</span>) &#123;</span><br><span class="line">                ret = <span class="built_in">super</span>.loadClass(name);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> ret;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Access to final protected superclass member from outer class.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        Class <span class="title function_">defineClass</span><span class="params">(<span class="keyword">final</span> <span class="type">byte</span>[] b)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> defineClass(<span class="literal">null</span>, b, <span class="number">0</span>, b.length);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里我们可以看到，defineClass 方法的访问权限从父类的受保护类型变成了现在的默认类型，这样一来，在同一个包内的<code>TemplatesImpl</code>就能直接调用它来加载字节码。</p>
+<p>从<code>TransletClassLoader#defineClass()</code>追溯调用链：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TemplatesImpl#getOutputProperties() -&gt; TemplatesImpl#newTransformer() -&gt;</span><br><span class="line"></span><br><span class="line">TemplatesImpl#getTransletInstance() -&gt; TemplatesImpl#defineTransletClasses()</span><br><span class="line"></span><br><span class="line">-&gt; TransletClassLoader#defineClass()</span><br></pre></td></tr></table></figure></div>
+
+<p>前两个入口的源码：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> Transformer <span class="title function_">newTransformer</span><span class="params">()</span></span><br><span class="line">        <span class="keyword">throws</span> TransformerConfigurationException</span><br><span class="line">    &#123;</span><br><span class="line">        TransformerImpl transformer;</span><br><span class="line"></span><br><span class="line">        transformer = <span class="keyword">new</span> <span class="title class_">TransformerImpl</span>(getTransletInstance(), _outputProperties,</span><br><span class="line">            _indentNumber, _tfactory);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (_uriResolver != <span class="literal">null</span>) &#123;</span><br><span class="line">            transformer.setURIResolver(_uriResolver);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (_tfactory.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING)) &#123;</span><br><span class="line">            transformer.setSecureProcessing(<span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> transformer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Implements JAXP&#x27;s Templates.getOutputProperties(). We need to</span></span><br><span class="line"><span class="comment">     * instanciate a translet to get the output settings, so</span></span><br><span class="line"><span class="comment">     * we might as well just instanciate a Transformer and use its</span></span><br><span class="line"><span class="comment">     * implementation of this method.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> Properties <span class="title function_">getOutputProperties</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> newTransformer().getOutputProperties();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (TransformerConfigurationException e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>在<code>newTransformer()</code>内部直接调用<code>newTransformer()</code>，在这个方法内，<code>transformer = new TransformerImpl(getTransletInstance(), _outputProperties, _indentNumber, _tfactory);</code>，这里很明显调用了<code>getTransletInstance()</code>方法，这就意味着每次调用<code>newTransformer()</code>来创建<code>TransformerImpl</code>对象时都会去执行<code>getTransletInstance()</code>。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Translet <span class="title function_">getTransletInstance</span><span class="params">()</span></span><br><span class="line">        <span class="keyword">throws</span> TransformerConfigurationException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (_name == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (_class == <span class="literal">null</span>) defineTransletClasses();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// The translet needs to keep a reference to all its auxiliary</span></span><br><span class="line">            <span class="comment">// class to prevent the GC from collecting them</span></span><br><span class="line">            <span class="type">AbstractTranslet</span> <span class="variable">translet</span> <span class="operator">=</span> (AbstractTranslet) _class[_transletIndex].newInstance();</span><br><span class="line">            translet.postInitialization();</span><br><span class="line">            translet.setTemplates(<span class="built_in">this</span>);</span><br><span class="line">            translet.setServicesMechnism(_useServicesMechanism);</span><br><span class="line">            translet.setAllowedProtocols(_accessExternalStylesheet);</span><br><span class="line">            <span class="keyword">if</span> (_auxClasses != <span class="literal">null</span>) &#123;</span><br><span class="line">                translet.setAuxiliaryClasses(_auxClasses);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> translet;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (InstantiationException e) &#123;</span><br><span class="line">            <span class="type">ErrorMsg</span> <span class="variable">err</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            <span class="type">ErrorMsg</span> <span class="variable">err</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>第一步安检：<code>if (_name == null) return null;</code>，这表明在利用时必须要利用反射给这个属性赋任意值，不然调用链直接断了。</p>
+<p>第二步安检：<code>if (_class == null) defineTransletClasses();</code>，<code>_class</code>为空时才调用<code>defineTransletClasses()</code>把字节码转化为<code>Class</code>对象。</p>
+<p>注：<code>_class</code>是一个<code>Class[]</code>数组，用来存放已经加载过的类，防止重复加载。对于一个全新的<code>TemplatesImpl</code>实例，<code>_class</code>默认是<code>null</code>，所以首次调用一定会调用<code>defineTransletClasses()</code>。</p>
+<p>最终执行：<code>AbstractTranslet translet=(AbstractTranslet)_class[_transletIndex].newInstance();</code></p>
+<ol>
+<li><code>_class[_transletIndex]</code>取出恶意类。<code>_class</code>数组已经在<code>defineTransletClasses()</code>赋值。<code>_transletIndex</code>是在那个方法中确定的，指向是那个父类为 <code>AbstractTranslet</code> 的类在数组中的位置</li>
+<li><code>.newInstance()</code>实例化，这里就是触发点，如果恶意代码写在类的静态代码块或者无参构造方法中则会执行。</li>
+</ol>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">defineTransletClasses</span><span class="params">()</span></span><br><span class="line">        <span class="keyword">throws</span> TransformerConfigurationException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (_bytecodes == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">ErrorMsg</span> <span class="variable">err</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.NO_TRANSLET_CLASS_ERR);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">TransletClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> (TransletClassLoader)</span><br><span class="line">            AccessController.doPrivileged(<span class="keyword">new</span> <span class="title class_">PrivilegedAction</span>() &#123;</span><br><span class="line">                <span class="keyword">public</span> Object <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TransletClassLoader</span>(ObjectFactory.findClassLoader(),_tfactory.getExternalExtensionsMap());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="type">int</span> <span class="variable">classCount</span> <span class="operator">=</span> _bytecodes.length;</span><br><span class="line">            _class = <span class="keyword">new</span> <span class="title class_">Class</span>[classCount];</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (classCount &gt; <span class="number">1</span>) &#123;</span><br><span class="line">                _auxClasses = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; classCount; i++) &#123;</span><br><span class="line">                _class[i] = loader.defineClass(_bytecodes[i]);</span><br><span class="line">                <span class="keyword">final</span> <span class="type">Class</span> <span class="variable">superClass</span> <span class="operator">=</span> _class[i].getSuperclass();</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Check if this is the main class</span></span><br><span class="line">                <span class="keyword">if</span> (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">                    _transletIndex = i;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    _auxClasses.put(_class[i].getName(), _class[i]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (_transletIndex &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                ErrorMsg err= <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.NO_MAIN_TRANSLET_ERR, _name);</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (ClassFormatError e) &#123;</span><br><span class="line">            <span class="type">ErrorMsg</span> <span class="variable">err</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.TRANSLET_CLASS_ERR, _name);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (LinkageError e) &#123;</span><br><span class="line">            <span class="type">ErrorMsg</span> <span class="variable">err</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ErrorMsg</span>(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">TransformerConfigurationException</span>(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这是利用链中最核心的部分，负责把<code>_bytecodes</code>里的字节码变成可执行的<code>Class</code>对象，并筛选出恶意类。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">TransletClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> (TransletClassLoader)</span><br><span class="line">    AccessController.doPrivileged(<span class="keyword">new</span> <span class="title class_">PrivilegedAction</span>() &#123;</span><br><span class="line">        <span class="keyword">public</span> Object <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TransletClassLoader</span>(ObjectFactory.findClassLoader(),</span><br><span class="line">                _tfactory.getExternalExtensionsMap());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></div>
+
+<p>这里创建了一个自定义类加载器，这是上面所讲的<code>TransletClassLoader</code>这个内部类，继承于<code>ClassLoader</code>。然后则是遍历并加载所有字节码。</p>
+<p>然后就是最关键的一步：父类检查。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="type">Class</span> <span class="variable">superClass</span> <span class="operator">=</span> _class[i].getSuperclass();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Check if this is the main class</span></span><br><span class="line"><span class="keyword">if</span> (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">    _transletIndex = i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    _auxClasses.put(_class[i].getName(), _class[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里判断了刚刚加载的类是不是<code>ABSTRACT_TRANSLET</code>，即<code>com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</code>。</p>
+<p>如果是，则把当前索引赋值给<code>_transletIndex</code>，标记这个类是主类。如果不是，则当作是辅助类，存入<code>_auxClasses</code>备用。</p>
+<p>这就说明，我们的恶意类必须继承<code>AbstractTranslet</code>，否则最终无法被实例化。</p>
+<p>到此调用链基本结束。</p>
+<h4 id="利用-TemplatesImpl-newTransformer-构造简单POC"><a href="#利用-TemplatesImpl-newTransformer-构造简单POC" class="headerlink" title="利用 TemplatesImpl#newTransformer() 构造简单POC"></a>利用 TemplatesImpl#newTransformer() 构造简单POC</h4><p>根据上面的分析，我们构造的字节码必须继承于<code>AbstractTranslet</code>这个抽象类，所以需要重写一下里面的方法。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TemplatesBytes</span> <span class="keyword">extends</span> <span class="title class_">AbstractTranslet</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transform</span><span class="params">(DOM document, SerializationHandler[] handlers)</span> <span class="keyword">throws</span> TransletException &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transform</span><span class="params">(DOM document, DTMAxisIterator iterator, SerializationHandler handler)</span> <span class="keyword">throws</span> TransletException &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TemplatesBytes</span><span class="params">()</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="built_in">super</span>();</span><br><span class="line">        Runtime.getRuntime().exec(<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> LoadClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Path;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TemplatesImpILoadTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldval</span><span class="params">(Object obj,String fieldName,Object value)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> obj.getClass().getDeclaredField(fieldName);</span><br><span class="line">        f.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        f.set(obj,value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception&#123;</span><br><span class="line">        <span class="type">byte</span>[] codes = Files.readAllBytes(Paths.get(<span class="string">&quot;C:\\Users\\32202\\Desktop\\java测试\\test\\src\\LoadClass\\TemplatesBytes.class&quot;</span>));</span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TemplatesImpl</span>();</span><br><span class="line">        setFieldval(templates,<span class="string">&quot;_name&quot;</span>,<span class="string">&quot;Calc&quot;</span>);</span><br><span class="line">        setFieldval(templates,<span class="string">&quot;_bytecodes&quot;</span>,<span class="keyword">new</span> <span class="title class_">byte</span>[][]&#123;codes&#125;);</span><br><span class="line">        setFieldval(templates,<span class="string">&quot;_tfactory&quot;</span>,<span class="keyword">new</span> <span class="title class_">TransformerFactoryImpl</span>());</span><br><span class="line">        <span class="comment">/*这一步很重要，因为在源码中有</span></span><br><span class="line"><span class="comment">    return new TransletClassLoader(ObjectFactory.findClassLoader(),_tfactory.getExternalExtensionsMap());，而_tfactory默认是null,</span></span><br><span class="line"><span class="comment">    需要赋一个值来让程序走下去*/</span></span><br><span class="line">        templates.newTransformer();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里在运行时会报一个空指针的错，但是没什么影响，依然会弹出计算器。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>类加载这部分内容感觉还是挺重要的，所以专门写了这一篇博客来记录一下我的学习成果，不过主要还是参考了别的大佬的内容，可以说内容几乎是一样的，但是其中也加了一些我自己的理解。</p>
+<p>这一篇博客还只是对类加载的基本认识，中间有些地方还是有一点模糊的，但是相比之前已经有了很大改善了，也是有了不小的收获吧。之后还会有更多关于动态加载字节码的内容，遇到之后会继续更新。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> java类的动态加载</li>
+        <li><strong>Author:</strong> SoloWalker</li>
+        <li><strong>Created at
+                :</strong> 2026-04-24 00:00:00</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-04-28 20:42:18
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://s0lowalker.github.io/2026/04/24/Java动态类加载/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/java%E5%AE%89%E5%85%A8%EF%BC%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">#java安全，类加载机制</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/04/21/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BURLDNS%E9%93%BE/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">java反序列化之URLDNS链</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.js';
+
+      (function() {
+        const startPath = location.pathname;
+        const startTime = Date.now();
+        const retryDelay = 200;
+        const retryLimit = 5000;
+
+        const runWaline = () => {
+          if (location.pathname !== startPath) {
+            return;
+          }
+
+          const container = document.getElementById('waline');
+          if (!container) {
+            if (Date.now() - startTime < retryLimit) {
+              setTimeout(runWaline, retryDelay);
+            }
+            return;
+          }
+
+          if (window.redefineWalineInstance?.destroy) {
+            window.redefineWalineInstance.destroy();
+          }
+
+          container.innerHTML = '';
+          window.redefineWalineInstance = init({
+            el: '#waline',
+            serverURL: 'https://example.example.com',
+            path: location.pathname,
+            dark: 'body[class~="dark-mode"]',
+            reaction: false,
+            requiredMeta: ['nick', 'mail'],
+            emoji: [],
+                      lang: 'zh-CN',
+          });
+        };
+
+        runWaline();
+      })();
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">java类的动态加载</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD"><span class="nav-text">java类的动态加载</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%92%8C%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="nav-text">类加载器和双亲委派机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-text">类加载器的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E7%A7%8D%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="nav-text">3种类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="nav-text">双亲委派机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%9D%97%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F"><span class="nav-text">代码块加载顺序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%AD%97%E8%8A%82%E7%A0%81"><span class="nav-text">动态加载字节码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-text">字节码的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URLClassLoader-%E5%8A%A0%E8%BD%BD%E8%BF%9C%E7%A8%8B-class-%E6%96%87%E4%BB%B6"><span class="nav-text">URLClassLoader 加载远程 class 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ClassLoader-defineClass-%E7%9B%B4%E6%8E%A5%E5%8A%A0%E8%BD%BD%E5%AD%97%E8%8A%82%E7%A0%81"><span class="nav-text">ClassLoader#defineClass 直接加载字节码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unsafe-%E5%8A%A0%E8%BD%BD%E5%AD%97%E8%8A%82%E7%A0%81"><span class="nav-text">Unsafe 加载字节码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TemplatesImpl-%E5%8A%A0%E8%BD%BD%E5%AD%97%E8%8A%82%E7%A0%81"><span class="nav-text">TemplatesImpl 加载字节码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">SoloWalker</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        14 posts in total
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.9.0</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container" role="dialog" aria-modal="true" aria-label="Image viewer">
+	<button class="image-viewer-close" type="button" aria-label="Close">
+		<i class="fa-solid fa-xmark"></i>
+	</button>
+	<button class="image-viewer-prev" type="button" aria-label="Prev">
+		<i class="fa-solid fa-chevron-left"></i>
+	</button>
+	<div class="image-viewer-frame">
+		<img src="" alt="">
+	</div>
+	<div class="image-viewer-exif-panel hidden absolute left-1/2 bottom-20 -translate-x-1/2 w-[min(92vw,420px)] max-h-[60vh] overflow-hidden rounded-2xl bg-background-color-transparent-80 p-4 text-left shadow-redefine-flat backdrop-blur-md" role="dialog" aria-label="EXIF" aria-hidden="true">
+		<div class="flex items-center justify-between mb-3">
+			<span class="text-sm font-semibold text-first-text-color">EXIF</span>
+			<button class="image-viewer-exif-close flex h-8 w-8 items-center justify-center rounded-full bg-background-color-transparent-80 text-first-text-color transition hover:bg-background-color-transparent-40" type="button" aria-label="Close">
+				<i class="fa-solid fa-xmark text-[0.65rem]"></i>
+			</button>
+		</div>
+		<div class="image-viewer-exif-cards grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide"></div>
+		<template class="image-viewer-exif-card-template">
+			<div class="rounded-lg bg-background-color-transparent-40 px-3 py-2">
+				<div class="image-viewer-exif-card-header flex items-center gap-2 mb-1">
+					<i class="image-viewer-exif-card-icon fa-solid fa-circle-info text-xs text-third-text-color"></i>
+					<div class="image-viewer-exif-card-title text-xs font-semibold text-first-text-color"></div>
+				</div>
+				<div class="image-viewer-exif-card-items flex flex-col gap-1"></div>
+			</div>
+		</template>
+	</div>
+	<button class="image-viewer-exif-toggle flex items-center gap-2 hidden absolute left-1/2 bottom-6 -translate-x-1/2 rounded-full border border-border-color bg-background-color-transparent-80 px-4 py-2 text-first-text-color backdrop-blur-md transition hover:bg-background-color-transparent-40" type="button" aria-label="EXIF" aria-expanded="false">
+		<i class="fa-solid fa-circle-info text-xs"></i>
+		<span class="text-xs font-semibold uppercase tracking-wider">EXIF</span>
+	</button>
+	<button class="image-viewer-next" type="button" aria-label="Next">
+		<i class="fa-solid fa-chevron-right"></i>
+	</button>
+</div>
+
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    window.swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+
+    window.dispatchEvent(
+        new CustomEvent("redefine:swup:ready", {
+            detail: {
+                swup: window.swup,
+            },
+        }),
+    );
+</script>
+
+
+
+
+	
+<script src="/js/build/main.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+
+	
+</body>
+
+</html>
