@@ -376,7 +376,7 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">9</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
         <div class="label text-third-text-color text-sm">Tags</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
@@ -384,7 +384,7 @@
         <div class="label text-third-text-color text-sm">Categories</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">16</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">17</div>
         <div class="label text-third-text-color text-sm">Posts</div>
     </a>
 </div>
@@ -415,7 +415,7 @@
         <section class="archive-item mb-spacing-unit last:mb-0">
             <div class="archive-item-header flex flex-row items-center mb-2">
                 <span class="archive-year font-semibold text-3xl mr-2">2026</span>
-                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">1</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">2</span>
             </div>
             
             <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
@@ -426,6 +426,13 @@
                         <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-01'>
                     
                     <a href="/2026/05/01/JDK%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">JDK动态代理</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2026/05/01/%E5%8F%8D%E5%BC%B9shell/" class="block w-fit">
                         <span class="article-title my-0.5 text-2xl">JDK动态代理</span>
                     </a>
                     
@@ -474,7 +481,7 @@
                 
                 <p class="post-count space-x-0.5">
                     <span>
-                        16 posts in total
+                        17 posts in total
                     </span>
                     
                 </p>
@@ -505,196 +512,6 @@
         
             <div>
                 Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
-            </div>
-        
-        
-            <script data-swup-reload-script>
-                try {
-                    function odometer_init() {
-                    const elements = document.querySelectorAll('.odometer');
-                    elements.forEach(el => {
-                        new Odometer({
-                            el,
-                            format: '( ddd).dd',
-                            duration: 200
-                        });
-                    });
-                    }
-                    odometer_init();
-                } catch (error) {}
-            </script>
-        
-        
-        
-    </div>  
-</footer>
-		</div>
-	</div>
-
-	
-
-	<div class="right-side-tools-container">
-		<div class="side-tools-container">
-	<ul class="hidden-tools-list">
-		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
-			<i class="fa-regular fa-magnifying-glass-plus"></i>
-		</li>
-
-		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
-			<i class="fa-regular fa-magnifying-glass-minus"></i>
-		</li>
-
-		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
-			<i class="fa-regular fa-moon"></i>
-		</li>
-
-		<!-- rss -->
-		
-
-		
-
-		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
-			<i class="fa-regular fa-arrow-down"></i>
-		</li>
-	</ul>
-
-	<ul class="visible-tools-list">
-		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
-			<i class="fa-regular fa-cog fa-spin"></i>
-		</li>
-		
-		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
-			<i class="arrow-up fas fa-arrow-up"></i>
-			<span class="percent"></span>
-		</li>
-		
-		
-	</ul>
-</div>
-	</div>
-
-	<div class="image-viewer-container" role="dialog" aria-modal="true" aria-label="Image viewer">
-	<button class="image-viewer-close" type="button" aria-label="Close">
-		<i class="fa-solid fa-xmark"></i>
-	</button>
-	<button class="image-viewer-prev" type="button" aria-label="Prev">
-		<i class="fa-solid fa-chevron-left"></i>
-	</button>
-	<div class="image-viewer-frame">
-		<img src="" alt="">
-	</div>
-	<div class="image-viewer-exif-panel hidden absolute left-1/2 bottom-20 -translate-x-1/2 w-[min(92vw,420px)] max-h-[60vh] overflow-hidden rounded-2xl bg-background-color-transparent-80 p-4 text-left shadow-redefine-flat backdrop-blur-md" role="dialog" aria-label="EXIF" aria-hidden="true">
-		<div class="flex items-center justify-between mb-3">
-			<span class="text-sm font-semibold text-first-text-color">EXIF</span>
-			<button class="image-viewer-exif-close flex h-8 w-8 items-center justify-center rounded-full bg-background-color-transparent-80 text-first-text-color transition hover:bg-background-color-transparent-40" type="button" aria-label="Close">
-				<i class="fa-solid fa-xmark text-[0.65rem]"></i>
-			</button>
-		</div>
-		<div class="image-viewer-exif-cards grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide"></div>
-		<template class="image-viewer-exif-card-template">
-			<div class="rounded-lg bg-background-color-transparent-40 px-3 py-2">
-				<div class="image-viewer-exif-card-header flex items-center gap-2 mb-1">
-					<i class="image-viewer-exif-card-icon fa-solid fa-circle-info text-xs text-third-text-color"></i>
-					<div class="image-viewer-exif-card-title text-xs font-semibold text-first-text-color"></div>
-				</div>
-				<div class="image-viewer-exif-card-items flex flex-col gap-1"></div>
-			</div>
-		</template>
-	</div>
-	<button class="image-viewer-exif-toggle flex items-center gap-2 hidden absolute left-1/2 bottom-6 -translate-x-1/2 rounded-full border border-border-color bg-background-color-transparent-80 px-4 py-2 text-first-text-color backdrop-blur-md transition hover:bg-background-color-transparent-40" type="button" aria-label="EXIF" aria-expanded="false">
-		<i class="fa-solid fa-circle-info text-xs"></i>
-		<span class="text-xs font-semibold uppercase tracking-wider">EXIF</span>
-	</button>
-	<button class="image-viewer-next" type="button" aria-label="Next">
-		<i class="fa-solid fa-chevron-right"></i>
-	</button>
-</div>
-
-
-	
-
-</main>
-
-
-
-<script src="/js/build/libs/Swup.min.js"></script>
-
-<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
-
-<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
-
-<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
-
-<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
-
-<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
-
-<script>
-    window.swup = new Swup({
-        plugins: [
-            new SwupScriptsPlugin({
-                optin: true,
-            }),
-            new SwupProgressPlugin(),
-            new SwupScrollPlugin({
-                offset: 80,
-            }),
-            new SwupSlideTheme({
-                mainElement: ".main-content-body",
-            }),
-            new SwupPreloadPlugin(),
-        ],
-        containers: ["#swup"],
-    });
-
-    window.dispatchEvent(
-        new CustomEvent("redefine:swup:ready", {
-            detail: {
-                swup: window.swup,
-            },
-        }),
-    );
-</script>
-
-
-
-	
-<script src="/js/build/main.js" type="module"></script>
-
-
-
-    
-<script src="/js/build/libs/odometer.min.js"></script>
-
-    
-<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
-
-
-
-
-
-
-
-  
-<script src="/js/build/libs/Typed.min.js"></script>
-
-
-
-
-
-
-
-
-
-
-<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
-
-
-
-	
-</body>
-
-</html>an> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
             </div>
         
         
